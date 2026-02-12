@@ -1,0 +1,18 @@
+// next.config.mjs
+import createMDX from "@next/mdx";
+
+/** @type {import('next').NextConfig} */
+const nextConfig = {
+  pageExtensions: ["js", "jsx", "md", "mdx", "ts", "tsx"],
+};
+
+const withMDX = createMDX({
+  options: {
+    // PASS AS STRING: In newer Next.js versions, providing the 
+    // plugin name as a string helps Turbopack resolve it.
+    remarkPlugins: [['remark-gfm', {}]], 
+    rehypePlugins: [],
+  },
+});
+
+export default withMDX(nextConfig);
