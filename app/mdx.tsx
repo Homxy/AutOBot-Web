@@ -54,7 +54,7 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
     // Code Blocks: Matching the dark grey container in the image
     pre: ({ children }) => (
       <pre style={{ 
-        backgroundColor: '#1e2025', 
+        backgroundColor: '#2b2e35d0', 
         padding: '20px', 
         borderRadius: '8px', 
         overflowX: 'auto', 
@@ -67,7 +67,7 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
     code: ({ children }) => (
       <code style={{ 
         color: '#e2e8f0', 
-        backgroundColor: '#33415500', 
+        backgroundColor: '#2b2e357c', 
         padding: '2px 6px', 
         borderRadius: '4px',
         fontSize: '0.9em'

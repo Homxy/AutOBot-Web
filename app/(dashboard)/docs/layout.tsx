@@ -20,7 +20,7 @@ export default function DocsLayout({ children }: { children: React.ReactNode }) 
         overflowY: 'auto',    // Enable vertical scrolling here
         height: '100%'        // Occupy full height of parent
       }}>
-        <div style={{ maxWidth: '900px', margin: '0 auto' }}>
+        <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
           {children}
         </div>
       </main>
