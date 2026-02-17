@@ -1,0 +1,127 @@
+## Function Reference (Arduino Side)
+
+#### **Create Class Robot(Init)**
+
+```cpp
+#include "ArduinoRobot.h"
+robot.init(type, motorpins, number of motors, deviation);
+```
+ 
+| Parameter | Type     | Description                       |
+| :-------- | :------- | :-------------------------------- |
+| `type` | `string` | DRIVE_DIFFERENTIAL / DRIVE_OMNI_3W / DRIVE_MECANUM |
+| `motorpins (diff 2w)` | `array` |`{FL_IN1, FL_IN2, FR_IN1, FR_IN2}` |
+| `motorpins (diff 4w)` | `array` |`{FL_IN1, FL_IN2, FR_IN1, FR_IN2, RL_IN1, RL_IN2, RR_IN1, RR_IN2}` |
+| `motorpins (omni)` | `array` |`{M1_IN1, M1_IN2, M2_IN1, M2_IN2, M3_IN1, M3_IN2}` |
+| `motorpins (mac)` | `array` |`{FL_IN1, FL_IN2, FR_IN1, FR_IN2, RL_IN1, RL_IN2, RR_IN1, RR_IN2}` |
+| `number of motors` | `int` |just a number for motors(2, 3, 4, 6, ...) |
+| `deviation` | `int` |use pwm to control deviation of robot rectilinear motion (min -100 max 100) | 
+| `deviation` | `int` |Negative Values (-1 to -100):` Reduces the speed of the RIGHT motors. Use this if your robot naturally drifts to the LEFT. | 
+| `deviation` | `int` |Positive Values (1 to 100):` Reduces the speed of the LEFT motors. Use this if your robot naturally drifts to the RIGHT. | 
+
+
+
+
+
+
+
+
+#
+#### **Drive Function**
+
+```
+  robot.drive(speed, dir, ang);
+```
+
+| Parameter | Type     | Range |Description                       | 
+| :-------- | :------- | ------- |:-------------------------------- |
+| `speed`      | `int` | 0 -> 100 | speed of robot move | 
+| `dir`      | `int` | 0 -> 360 | direction 0 forward / 180 backward |
+| `ang`      | `int` | -100 -> 100 | rotation -100 left / 100 right |
+
+#
+#### **PI Communication( For AI )** 
+
+in void setup
+```
+  PiSerial.begin(bautrate, SERIAL_8N1, PI_RX_PIN, PI_TX_PIN);
+  piComm.init();
+```
+
+| Parameter | Type     | Default |Description                       | 
+| :-------- | :------- | ------- |:-------------------------------- |
+| `bautrate`      | `int` | 115200 | bautrate for communication | 
+| `PI_RX_PIN`      | `int` | 16 | arduino pin that connect to PI rx |
+| `PI_TX_PIN`      | `int` | 17 | arduino pin that connect to PI tx |
+
+#
+to request AI (Human tracking)
+```
+  requestHuman(baseSpeed, turnGain, boxSize, deadzone)
+```
+| Parameter | Type     | Default |Description                       | 
+| :-------- | :------- | ------- |:-------------------------------- |
+| `baseSpeed`      | `int` | 0 | 0 for only rotation. 100 robot always move forward | 
+| `turnGain`      | `float` | 0.5 | more gain = more sensitivity (undershoot, overshoot) |
+| `boxSize`      | `int` | 30000 | more number = robot closer to human |
+| `deadzone`      | `int` | 5000 | a zone that robot will not turn |
+
+#
+to request AI (Line tracking)
+```
+  requestLine(baseSpeed, turnGain, thresh, color, defS, defD, defA)
+```
+| Parameter | Type     | Default |Description                       | 
+| :-------- | :------- | ------- |:-------------------------------- |
+| `baseSpeed`      | `int` | 0 | 0 for only rotation. 100 robot always move forward | 
+| `turnGain`      | `float` | 0.5 | more gain = more sensitivity (undershoot, overshoot) |
+| `thresh`      | `int` | 100 | threshold for masked frame  |
+| `color`      | `String` | black | line color |
+| `defS`      | `int` | 0 | default speed if line not found |
+| `defD`      | `int` | 0 | default direction if line not found |
+| `defA`      | `int` | 0 | default angular if line not found |
+
+
+#
+to Set drive type (for mecanum to slide)
+```
+  setDriveType(String type)
+```
+#
+to stop all AI processing
+```
+  requestStop()
+```
+
+
+#
+in void loop
+
+use to receive (speed, dir, ang) from pi and drive robot.
+```
+  piComm.handle(); 
+```
+
+##
+
+## Function Reference (Raspberry Pi Side)
+#### **Communication Protocal** 
+start with ```:M```|
+```parameter=value```|
+```parameter=value```|....
+
+example 
+```:M|spd=50|sen=0.8|LN=1```  -> Sets speed to 50, sensitivity to 0.8, and starts Line Follow mode.
+
+| Parameter | Type      |Description                       | 
+| :-------- | :-------  |:-------------------------------- |
+| `LN`      | `int`  | line track mode (0,stop) (1,start) | 
+| `HM`      | `int`  | human track mode (0,stop) (1,start)| 
+| `spd`      | `int`  | Moving speed (0-100) (both)| 
+| `sen`      | `float`  | Sensitivity (both) |
+| `thr`      | `int`  | Threshold (0-100) (line tracking)|
+| `type`      | `String`  | type of drive(diff, omni, mac) |
+| `box`      | `int` | human box size (human tracking) |
+| `dzone`      | `int`| deadzone (both) |
+| `col`      | `int`  | line color  (line tracking)|
+| `def`      | `int`  | def=speed,direction,angular (e.g., 50,180,0) (line tracking)|

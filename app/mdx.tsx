@@ -67,7 +67,7 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
     code: ({ children }) => (
       <code style={{ 
         color: '#e2e8f0', 
-        backgroundColor: '#334155', 
+        backgroundColor: '#33415500', 
         padding: '2px 6px', 
         borderRadius: '4px',
         fontSize: '0.9em'

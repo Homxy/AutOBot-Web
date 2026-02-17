@@ -32,20 +32,20 @@ export default function Sidebar() {
 
   return (
     <aside style={{ 
-      width: '280px', 
-      backgroundColor: '#0f172a', 
-      borderRight: '1px solid #334155', 
-      padding: '30px 20px', 
-      height: '100vh', 
-      position: 'sticky', 
-      top: 0,
-      overflowY: 'auto'
+    width: '280px', 
+    backgroundColor: '#0f172a', 
+    borderRight: '1px solid #334155', 
+    padding: '30px 20px', 
+    height: '100%',         // Change from 100vh to 100% of the parent
+    display: 'flex',
+    flexDirection: 'column',
+    flexShrink: 0           // Prevent sidebar from squishing
     }}>
       <div style={{ color: '#ffffff', fontWeight: 'bold', fontSize: '1.4rem', marginBottom: '30px', letterSpacing: '1px' }}>
         AUTOBOT <span style={{ color: '#facc15' }}>DOCS</span>
       </div>
       
-      <nav>
+      <nav style={{ flex: 1 }}> {/* flex: 1 pushes the license to the bottom */}
         {menuItems.map((item) => {
           const isParentActive = pathname === item.href || (item.children?.some(child => pathname === child.href));
           
@@ -84,6 +84,17 @@ export default function Sidebar() {
           );
         })}
       </nav>
+
+      {/* License Badge Section */}
+      <div style={{ marginTop: '40px', paddingTop: '20px', borderTop: '1px solid #1e293b' }}>
+        <a href="http://www.gnu.org/licenses/agpl-3.0" target="_blank" rel="noopener noreferrer">
+          <img 
+            src="https://img.shields.io/badge/license-AGPL-blue.svg" 
+            alt="AGPL License" 
+            style={{ cursor: 'pointer' }}
+          />
+        </a>
+      </div>
     </aside>
   );
 }

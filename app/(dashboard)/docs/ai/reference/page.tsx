@@ -1,24 +1,25 @@
-// Example for app/(dashboard)/docs/feature/spec/page.tsx
-export default function DummyPage() {
-  return (
-    <div style={{ color: '#e2e8f0' }}>
-      <h1 style={{ color: '#ffffff', fontSize: '2.5rem', marginBottom: '20px' }}>
-        AI Ref Coming Soon
-      </h1>
-      <p style={{ color: '#94a3b8', fontSize: '1.1rem' }}>
-        This section of the <strong>Autobot</strong> documentation is currently under development. 
-        Please check back later for technical specifications and details.
-      </p>
-      <div style={{ 
-        marginTop: '40px', 
-        padding: '20px', 
-        border: '1px dashed #334155', 
-        borderRadius: '8px',
-        textAlign: 'center',
-        color: '#64748b'
-      }}>
-        [ Documentation Placeholder ]
-      </div>
-    </div>
-  );
+"use client"
+import React from "react";
+import Link from 'next/link';
+import FuncRef from "./func_ref.mdx"
+import { useMDXComponents } from "../../../../mdx"
+import { MDXProvider } from '@mdx-js/react'
+
+
+export default function Docs(){
+    const components = useMDXComponents({});
+    return(
+        <MDXProvider components={components}>
+            <div style={{ padding: '40px', maxWidth: '1000px', margin: '0 auto', color: '#e2e8f0' }}>
+                <FuncRef />
+                <section style={{ marginTop: '30px' }}>
+                <h2 style={{ color: '#38bdf8' }}>More Info</h2>
+                <ul style={{ lineHeight: '1.8' }}>
+                <li><Link href="/docs/ai/demo" style={{ color: '#facc15' }}>Demo</Link></li>
+                <li><Link href="/docs/ai/advanced" style={{ color: '#facc15' }}>Advance Edit</Link></li>
+                </ul>
+            </section>
+            </div>
+        </MDXProvider>
+    )
 }
