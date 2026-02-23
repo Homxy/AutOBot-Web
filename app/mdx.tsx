@@ -31,7 +31,19 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
         marginBottom: '10px' 
       }}>{children}</h4>
     ),
-    
+    img: (props) => (
+      <img 
+        {...props} 
+        style={{ 
+          maxWidth: '100%', 
+          height: 'auto', 
+          borderRadius: '8px', 
+          marginTop: '20px',
+          marginBottom: '20px',
+          border: '1px solid #334155'
+        }} 
+      />
+    ),
     // Paragraphs: Subtle grey/white for readability
     p: ({ children }) => (
       <p style={{ 

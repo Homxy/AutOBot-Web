@@ -2,11 +2,10 @@
 
 Autobot Library is a modular and efficient Arduino library designed to simplify mobile robot development. It abstracts complex kinematics for various drive types and provides builtin communication handlers for remote control via WiFi (UDP) or AI coprocessors (Raspberry Pi/Jetson).
 
-
-
 ## Requirements
 
 ### 1. Arduino (Basic Control)
+
 Hardware and software required for basic robot movement (without AI).
 
 #### Hardware
@@ -25,6 +24,7 @@ Hardware and software required for basic robot movement (without AI).
 ---
 #
 ### 2. Arduino + Raspberry Pi (AI & Vision)
+
 Additional requirements for Human Tracking and Line Tracking features.
 
 #### Hardware
@@ -32,12 +32,61 @@ Additional requirements for Human Tracking and Line Tracking features.
 * **Camera:** USB Webcam or Raspberry Pi Camera.
 * **Connection:** 3x Jumper wires for UART communication (RX, TX, GND).
 
-#### Wiring (ESP32 to Raspberry Pi)
+---
 
-Connect the ESP32 to the Raspberry Pi GPIO headers as follows:
+# Usage (Getting Started)
 
+## Raspberry Pi Image Setup
+
+To use the AI features (Human/Line Tracking), you must flash the pre-configured OS image:
+
+Download Image: [RaspberryPi Image.bin](https://mega.nz/file/e34WADqS#fa6yn67Adh00KQ7MNSCv5WMbqWxhMRH3YfOvYcj7gW0)
+
+Flash Tool: Download and install [BalenaEtcher](https://etcher.balena.io).
+
+Flashing: Insert your SD card, select the downloaded .bin image, and click "Flash!".
+![Select img file](/assets/ai/1.png)
+![Select sd card](/assets/ai/2.png)
+![Flash!](/assets/ai/3.png)
+
+
+## Wiring Diagram
+
+Connect the ESP32 to the Raspberry Pi GPIO headers to enable communication:
 | Signal | ESP32 Pin | Raspberry Pi Pin |
 | :--- | :--- | :--- |
 | **RX** | Pin 16 | GPIO 14 (TXD) |
 | **TX** | Pin 17 | GPIO 15 (RXD) |
 | **GND** | GND | GND |
+
+## Arduino Implementation
+
+Include the following logic in your .ino sketch to handle commands from the Raspberry Pi.
+
+```cpp
+#include <ArduinoRobot.h>
+
+// กำหนดขาสำหรับคุยกับ Pi (สามารถเปลี่ยนได้ถ้าขา 16/17 ไม่ว่าง)
+#define PI_RX_PIN 16
+#define PI_TX_PIN 17
+
+// ================= OBJECTS =================
+ArduinoClient robot;
+PiCommunication piComm(PiSerial, robot);
+
+void setup() {
+  // เริ่มต้นการสื่อสาร Serial กับ Raspberry Pi
+  PiSerial.begin(115200, SERIAL_8N1, PI_RX_PIN, PI_TX_PIN);
+  
+  // เริ่มต้นระบบสื่อสาร
+  piComm.init();
+}
+
+void loop() {
+  // รอรับและประมวลผลคำสั่งจาก AI (Raspberry Pi)
+  piComm.handle(); 
+}
+```
+
+More info on Demo
+For full examples and advanced drive configurations, please refer to the examples/ folder in the library.
