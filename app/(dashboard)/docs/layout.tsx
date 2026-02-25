@@ -1,29 +1,30 @@
 // app/(dashboard)/docs/layout.tsx
 import Sidebar from './Sidebar';
+import { ThemeProvider } from './ThemeContext';
 
 export default function DocsLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div style={{ 
-      display: 'flex', 
-      height: '93vh',        // Lock height to the screen
-      overflow: 'hidden',     // Prevent the whole page from scrolling
-      backgroundColor: '#020617', 
-      color: '#e2e8f0' 
-    }}>
-      {/* Sidebar stays fixed on the left */}
-      <Sidebar />
-      
-      {/* Only this 'main' section will scroll */}
-      <main style={{ 
-        flex: 1, 
-        padding: '60px 40px', 
-        overflowY: 'auto',    // Enable vertical scrolling here
-        height: '100%'        // Occupy full height of parent
+    <ThemeProvider>
+      <div style={{ 
+        display: 'flex', 
+        height: '93vh', 
+        overflow: 'hidden',
+        backgroundColor: 'var(--bg-main)', 
+        color: 'var(--text-secondary)',
+        transition: 'background-color 0.3s ease'
       }}>
-        <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
-          {children}
-        </div>
-      </main>
-    </div>
+        <Sidebar />
+        <main style={{ 
+          flex: 1, 
+          padding: '60px 40px', 
+          overflowY: 'auto',
+          height: '100%'
+        }}>
+          <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
+            {children}
+          </div>
+        </main>
+      </div>
+    </ThemeProvider>
   );
 }

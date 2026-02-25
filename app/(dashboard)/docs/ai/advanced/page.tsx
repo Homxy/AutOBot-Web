@@ -24,7 +24,7 @@ const CustomH2 = ({ children }: { children: React.ReactNode }) => {
 
 const CustomH3 = ({ children }: { children: React.ReactNode }) => {
   const id = typeof children === 'string' ? slugify(children) : '';
-  return <h3 id={id} style={{ color: '#bae6fd', scrollMarginTop: '100px' }}>{children}</h3>;
+  return <h3 id={id} style={{ color: 'var(--text-secondary)', scrollMarginTop: '100px' }}>{children}</h3>;
 };
 
 // 3. The Table of Contents Component
@@ -44,8 +44,8 @@ const TableOfContents = () => {
 
   return (
     <nav style={{ position: 'sticky', top: '20px', alignSelf: 'start' }}>
-      <h4 style={{ color: '#fff', marginBottom: '10px', fontSize: '1.1rem' }}>On this page</h4>
-      <ul style={{ listStyle: 'none', padding: 0, borderLeft: '2px solid #334155' }}>
+      <h4 style={{ color: 'var(--text-primary)', marginBottom: '10px', fontSize: '1.1rem' }}>On this page</h4>
+      <ul style={{ listStyle: 'none', padding: 0, borderLeft: '2px solid var(--border-color)' }}>
         {headings.map((heading) => (
           <li key={heading.id} style={{ marginBottom: '8px' }}>
             <a
@@ -53,7 +53,7 @@ const TableOfContents = () => {
               style={{
                 display: 'block',
                 paddingLeft: heading.level === 3 ? '20px' : '10px',
-                color: heading.level === 2 ? '#e2e8f0' : '#94a3b8',
+                color: heading.level === 2 ? 'var(--text-secondary)' : 'var(--text-muted)',
                 textDecoration: 'none',
                 fontSize: '0.9rem',
                 borderLeft: '2px solid transparent',
@@ -87,20 +87,20 @@ export default function Docs() {
          1. Removed "margin: 0 auto" (which centered it).
          2. Reduced "padding" from 40px to 20px (optional, for tighter spacing).
       */}
-      <div style={{ 
-        display: 'flex', 
-        gap: '10px', 
-        maxWidth: '1200px', 
+      <div style={{
+        display: 'flex',
+        gap: '10px',
+        maxWidth: '1200px',
         margin: '0',        // <--- Changed from '0 auto' to '0' to align left
         padding: '10px',    // <--- Reduced padding (was 40px)
         position: 'relative'
       }}>
-        
+
         {/* Left Column: Content */}
-        <div style={{ flex: 1, minWidth: 0, color: '#e2e8f0' }}>
+        <div style={{ flex: 1, minWidth: 0, color: 'var(--text-secondary)' }}>
           <Advanced />
-          
-          <section style={{ marginTop: '50px', paddingTop: '20px', borderTop: '1px solid #334155' }}>
+
+          <section style={{ marginTop: '50px', paddingTop: '20px', borderTop: '1px solid var(--border-color)' }}>
             <h2 id="more-info" style={{ color: '#38bdf8' }}>More Info</h2>
             <ul style={{ lineHeight: '1.8' }}>
               <li><Link href="/docs/ai/usage" style={{ color: '#facc15' }}>Getting Start</Link></li>
@@ -112,12 +112,12 @@ export default function Docs() {
 
         {/* Right Column: Table of Contents */}
         <div style={{ width: '250px', flexShrink: 0, display: 'none' }} className="toc-container">
-            {/* We hide this on small screens via CSS class or use simple logic below */}
-            <div className="hidden md:block"> 
-                <TableOfContents />
-            </div>
+          {/* We hide this on small screens via CSS class or use simple logic below */}
+          <div className="hidden md:block">
+            <TableOfContents />
+          </div>
         </div>
-        
+
         {/* Quick inline style for responsiveness (Optional: move to CSS file) */}
         <style jsx global>{`
           @media (min-width: 1000px) {

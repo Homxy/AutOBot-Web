@@ -2,6 +2,7 @@
 "use client";
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useTheme } from './ThemeContext';
 
 const menuItems = [
   { title: "1. Overview", href: "/docs" },
@@ -29,30 +30,48 @@ const menuItems = [
 
 export default function Sidebar() {
   const pathname = usePathname();
+  const { isDark, toggleTheme } = useTheme();
 
   return (
     <aside style={{ 
-    width: '250px', 
-    backgroundColor: '#0f172a', 
-    borderRight: '1px solid #334155', 
-    padding: '30px 20px', 
-    height: '100%',         // Change from 100vh to 100% of the parent
-    display: 'flex',
-    flexDirection: 'column',
-    flexShrink: 0           // Prevent sidebar from squishing
+      width: '250px', 
+      backgroundColor: 'var(--bg-sidebar)', 
+      borderRight: '1px solid var(--border-color)', 
+      padding: '30px 20px', 
+      height: '100%',
+      display: 'flex',
+      flexDirection: 'column',
+      flexShrink: 0,
+      transition: 'all 0.3s ease'
     }}>
-      <div style={{ color: '#ffffff', fontWeight: 'bold', fontSize: '1.4rem', marginBottom: '30px', letterSpacing: '1px' }}>
-        AUTOBOT <span style={{ color: '#facc15' }}>DOCS</span>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '30px' }}>
+        <div style={{ color: 'var(--text-primary)', fontWeight: 'bold', fontSize: '1.4rem', letterSpacing: '1px' }}>
+          AUTOBOT <span style={{ color: '#facc15' }}>DOCS</span>
+        </div>
+        <button 
+          onClick={toggleTheme}
+          style={{
+            background: 'none',
+            border: '1px solid var(--border-color)',
+            borderRadius: '8px',
+            padding: '4px 8px',
+            cursor: 'pointer',
+            fontSize: '1.2rem',
+            color: 'var(--text-primary)'
+          }}
+        >
+          {isDark ? '🌙' : '☀️'}
+        </button>
       </div>
       
-      <nav style={{ flex: 1 }}> {/* flex: 1 pushes the license to the bottom */}
+      <nav style={{ flex: 1 }}>
         {menuItems.map((item) => {
           const isParentActive = pathname === item.href || (item.children?.some(child => pathname === child.href));
           
           return (
             <div key={item.title} style={{ marginBottom: '20px' }}>
               <Link href={item.href} style={{ 
-                color: isParentActive ? '#38bdf8' : '#e2e8f0', 
+                color: isParentActive ? '#38bdf8' : 'var(--text-secondary)', 
                 textDecoration: 'none', 
                 fontWeight: isParentActive ? 'bold' : '500',
                 fontSize: '1rem',
@@ -62,12 +81,12 @@ export default function Sidebar() {
               </Link>
               
               {item.children && (
-                <div style={{ paddingLeft: '15px', marginTop: '10px', borderLeft: '1px solid #334155' }}>
+                <div style={{ paddingLeft: '15px', marginTop: '10px', borderLeft: '1px solid var(--border-color)' }}>
                   {item.children.map((child) => {
                     const isChildActive = pathname === child.href;
                     return (
                       <Link key={child.title} href={child.href} style={{ 
-                        color: isChildActive ? '#38bdf8' : '#94a3b8', 
+                        color: isChildActive ? '#38bdf8' : 'var(--text-muted)', 
                         textDecoration: 'none', 
                         display: 'block', 
                         fontSize: '0.9rem', 
@@ -85,13 +104,11 @@ export default function Sidebar() {
         })}
       </nav>
 
-      {/* License Badge Section */}
-      <div style={{ marginTop: '40px', paddingTop: '20px', borderTop: '1px solid #1e293b' }}>
+      <div style={{ marginTop: '40px', paddingTop: '20px', borderTop: '1px solid var(--border-color)' }}>
         <a href="http://www.gnu.org/licenses/agpl-3.0" target="_blank" rel="noopener noreferrer">
           <img 
             src="https://img.shields.io/badge/license-AGPL-blue.svg" 
             alt="AGPL License" 
-            style={{ cursor: 'pointer' }}
           />
         </a>
       </div>

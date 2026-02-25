@@ -4,12 +4,12 @@ import Link from 'next/link'; // Add this line
 export default function OverviewPage() {
   return (
     <div>
-      <h1 style={{ color: '#ffffff', fontSize: '2.5rem', fontWeight: 'bold' }}>Autobot Library Overview</h1>
-      <p style={{ fontSize: '1.2rem', color: '#94a3b8', marginTop: '10px' }}>
+      <h1 style={{ color: 'var(--text-primary)', fontSize: '2.5rem', fontWeight: 'bold' }}>Autobot Library Overview</h1>
+      <p style={{ fontSize: '1.2rem', color: 'var(--text-muted)', marginTop: '10px' }}>
         Educational robotics platform for AI and Kinematics.
       </p>
       
-      <hr style={{ borderColor: '#334155', margin: '30px 0' }} />
+      <hr style={{ borderColor: 'var(--border-color)', margin: '30px 0' }} />
       
       <section>
         <h2 style={{ color: '#38bdf8' }}>Introduction</h2>
