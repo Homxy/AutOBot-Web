@@ -1,93 +1,106 @@
-# Autobot Library
+# Getting Started
 
-Autobot Library is a modular and efficient Arduino library designed to simplify mobile robot development. It abstracts complex kinematics for various drive types and provides builtin communication handlers for remote control via WiFi (UDP) or AI coprocessors (Raspberry Pi/Jetson).
+Autobot Library is a modular Arduino library designed to simplify mobile robot development. It abstracts complex kinematics for various drive configurations and provides built-in communication handlers for AI coprocessors such as Raspberry Pi and Jetson Nano.
 
 ## Requirements
 
-### 1. Arduino (Basic Control)
+### Arduino (Basic Control)
 
-Hardware and software required for basic robot movement (without AI).
+Hardware and software required for basic robot movement without AI features.
 
 #### Hardware
-* **Microcontroller:** ESP32 Development Board (Recommended for `HardwareSerial` support).
-* **Motor Driver:** PWM-compatible driver (e.g., L298N, TB6612FNG).
-    * 2/4 Channels for Differential Drive.
-    * 4 Channels for Mecanum/Omni Drive.
-* **Motors:** DC Motors (2 or 4 units depending on drive type).
-* **Power Supply:** Li-ion Battery (2S or 3S) suitable for your motors.
+
+| Component | Recommendation |
+| :--- | :--- |
+| **Microcontroller** | ESP32 Development Board (recommended for `HardwareSerial` support) |
+| **Motor Driver** | PWM-compatible driver (e.g., L298N, TB6612FNG) |
+| **Motors** | 2 or 4 DC motors, depending on drive type |
+| **Power Supply** | 2S or 3S Li-ion battery suitable for your motors |
 
 #### Software
-* **Arduino IDE:** Latest version.
-* **Library:** `ArduinoRobot.h` (Must be included in your project folder).
 
-##
+* [Arduino IDE](https://www.arduino.cc/en/software) — latest version recommended.
+* [`ArduinoRobot.h`](https://github.com/CannabiZz9/Autobot_Library/blob/main/ArduinoRobot.h) — the core library header. Must be placed in your project folder.
+
 ---
-#
-### 2. Arduino + Raspberry Pi (AI & Vision)
 
-Additional requirements for Human Tracking and Line Tracking features.
+### Arduino + Raspberry Pi (AI & Vision)
+
+Additional requirements for enabling Human Tracking and Line Tracking features.
 
 #### Hardware
-* **SBC:** Raspberry Pi 4 or 5 (Recommended for YOLOv8 performance).
-* **Camera:** USB Webcam or Raspberry Pi Camera.
-* **Connection:** 3x Jumper wires for UART communication (RX, TX, GND).
+
+| Component | Recommendation |
+| :--- | :--- |
+| **Single-Board Computer** | Raspberry Pi 4 or 5 (recommended for YOLOv8 performance) |
+| **Camera** | USB Webcam or Raspberry Pi Camera Module |
+| **Connection** | 3× jumper wires for UART (RX, TX, GND) |
 
 ---
-
-# Usage (Getting Started)
 
 ## Raspberry Pi Image Setup
 
-To use the AI features (Human/Line Tracking), you must flash the pre-configured OS image:
+To use the AI features (Human / Line Tracking), flash the pre-configured OS image onto your SD card.
 
-Download Image: [RaspberryPi Image.bin](https://archive.org/details/autobot_202602)
-![Download img file](/assets/ai/0.png)
+**1. Download the image:**
 
-Flash Tool: Download and install [BalenaEtcher](https://etcher.balena.io).
+[Autobot Raspberry Pi Image (.bin)](https://archive.org/details/autobot_202602)
 
-Flashing: Insert your SD card, select the downloaded .bin image, and click "Flash!".
-![Select img file](/assets/ai/1.png)
-![Select sd card](/assets/ai/2.png)
-![Flash!](/assets/ai/3.png)
+![Download the .bin image file](/assets/ai/0.png)
 
+**2. Install the flash tool:**
+
+Download and install [balenaEtcher](https://etcher.balena.io).
+
+**3. Flash the SD card:**
+
+Insert your SD card, select the downloaded `.bin` image, and click **Flash!**
+
+![Select the image file](/assets/ai/1.png)
+![Select the SD card](/assets/ai/2.png)
+![Click Flash](/assets/ai/3.png)
+
+---
 
 ## Wiring Diagram
 
-Connect the ESP32 to the Raspberry Pi GPIO headers to enable communication:
+Connect the ESP32 to the Raspberry Pi GPIO header using the following pinout:
+
 | Signal | ESP32 Pin | Raspberry Pi Pin |
 | :--- | :--- | :--- |
-| **RX** | Pin 16 | GPIO 14 (TXD) |
-| **TX** | Pin 17 | GPIO 15 (RXD) |
+| **RX** | GPIO 16 | GPIO 14 (TXD) |
+| **TX** | GPIO 17 | GPIO 15 (RXD) |
 | **GND** | GND | GND |
 
-## Arduino Implementation
+---
 
-Include the following logic in your .ino sketch to handle commands from the Raspberry Pi.
+## Minimal Arduino Sketch
+
+Include the following in your `.ino` sketch to establish communication with the Raspberry Pi:
 
 ```cpp
 #include <ArduinoRobot.h>
 
-// กำหนดขาสำหรับคุยกับ Pi (สามารถเปลี่ยนได้ถ้าขา 16/17 ไม่ว่าง)
+// UART pins connected to the Raspberry Pi
 #define PI_RX_PIN 16
 #define PI_TX_PIN 17
 
-// ================= OBJECTS =================
+// Create library objects
 ArduinoClient robot;
 PiCommunication piComm(PiSerial, robot);
 
 void setup() {
-  // เริ่มต้นการสื่อสาร Serial กับ Raspberry Pi
+  // Initialize serial communication with the Raspberry Pi
   PiSerial.begin(115200, SERIAL_8N1, PI_RX_PIN, PI_TX_PIN);
-  
-  // เริ่มต้นระบบสื่อสาร
+
+  // Initialize the communication handler
   piComm.init();
 }
 
 void loop() {
-  // รอรับและประมวลผลคำสั่งจาก AI (Raspberry Pi)
-  piComm.handle(); 
+  // Process incoming commands from the Raspberry Pi
+  piComm.handle();
 }
 ```
 
-More info on Demo
-For full examples and advanced drive configurations, please refer to the examples/ folder in the library.
+> For full examples and advanced drive configurations, see the [Examples](/docs/ai/demo) page.

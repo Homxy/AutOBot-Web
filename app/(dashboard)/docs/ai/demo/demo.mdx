@@ -1,254 +1,253 @@
+# Examples
+
+This page provides complete, ready-to-use sketches for common Autobot configurations. Each example demonstrates a different drive type and feature set.
+
 ## Installation
 
-Download  [ArduinoRobot.h](https://github.com/CannabiZz9/Autobot_Library/blob/main/ArduinoRobot.h)
+1. Download [`ArduinoRobot.h`](https://github.com/CannabiZz9/Autobot_Library/blob/main/ArduinoRobot.h).
+2. Place the file in your Arduino project folder.
+3. Include it at the top of your sketch:
 
-Add to Arduino IDE ```#include "ArduinoRobot.h"```
-    
-## Demo
+```cpp
+#include "ArduinoRobot.h"
+```
 
-### 2-Wheel Differential Drive Robot
-[Source Code](https://github.com/CannabiZz9/Autobot_Library/tree/main/Arduino-client-diff)
+---
+
+## Differential Drive (2-Wheel)
+
+### Differential With Raspberry Pi
+
+> [Source Code](https://github.com/CannabiZz9/Autobot_Library/tree/main/Arduino-client-diff)
 
 ```cpp
 #include "ArduinoRobot.h"
 
-// ================= PIN CONFIGURATION =================
-// ขามอเตอร์ที่คุณกำหนดมา (ESP32 38-pin)
-int motorPins[] = {18, 19, 22, 23}; 
+// ── Pin Configuration ──────────────────────────
+int motorPins[] = {18, 19, 22, 23};
 
-// ================= SERIAL CONFIG FOR PI =================
-// สร้าง Object HardwareSerial สำหรับคุยกับ Pi โดยใช้ UART2
-HardwareSerial PiSerial(2); 
+// ── Serial Configuration (Raspberry Pi) ────────
+HardwareSerial PiSerial(2);
 
-// กำหนดขาสำหรับคุยกับ Pi (สามารถเปลี่ยนได้ถ้าขา 16/17 ไม่ว่าง)
 #define PI_RX_PIN 16
 #define PI_TX_PIN 17
 
-// ================= OBJECTS =================
+// ── Objects ────────────────────────────────────
 ArduinoClient robot;
 PiCommunication piComm(PiSerial, robot);
 
 void setup() {
-  // 1. เริ่มต้น Serial Monitor (สำหรับต่อคอมพิวเตอร์ผ่าน USB)
+  // Start USB serial for debugging
   Serial.begin(115200);
-  Serial.println("ESP32 Ready. Type commands to send to Pi...");
+  Serial.println("ESP32 Ready.");
 
-  // 2. เริ่มต้น Serial สำหรับ Pi (Baud rate ต้องตรงกับ Python)
-  // รูปแบบ: .begin(baud, config, rx_pin, tx_pin)
+  // Start serial communication with the Pi
   PiSerial.begin(115200, SERIAL_8N1, PI_RX_PIN, PI_TX_PIN);
 
-  // 3. เริ่มต้น Robot (Drive Type: Differential 2 ล้อ)
+  // Initialize the robot (Differential, 2 motors, no deviation)
   robot.init(DRIVE_DIFFERENTIAL, motorPins, 2, 0);
-  
-  // 4. เริ่มต้นระบบสื่อสาร
+
+  // Initialize communication handler
   piComm.init();
 }
 
 void loop() {
-  piComm.handle(); 
+  piComm.handle();
 }
 ```
 
-### 2-Wheel Differential Drive Robot (No Raspberry Pi)
+### Differential Without Raspberry Pi
+
+A minimal sketch that drives the robot forward without any AI features.
+
 ```cpp
 #include "ArduinoRobot.h"
 
-// ================= PIN CONFIGURATION =================
-// ขามอเตอร์ที่คุณกำหนดมา (ESP32 38-pin)
-int motorPins[] = {18, 19, 22, 23}; 
+// ── Pin Configuration ──────────────────────────
+int motorPins[] = {18, 19, 22, 23};
 
-// ================= OBJECTS =================
+// ── Objects ────────────────────────────────────
 ArduinoClient robot;
 
 void setup() {
-  // 1. เริ่มต้น Robot (Drive Type: Differential 2 ล้อ)
+  // Initialize the robot (Differential, 2 motors, no deviation)
   robot.init(DRIVE_DIFFERENTIAL, motorPins, 2, 0);
-  
 }
 
 void loop() {
-  robot.drive(100,0,0);
+  // Drive forward at full speed
+  robot.drive(100, 0, 0);
 }
 ```
 
-### 4-Wheel Mecanum Drive Robot
-[Source Code](https://github.com/CannabiZz9/Autobot_Library/tree/main/Arduino-client-mac)
+---
+
+## Mecanum Drive (4-Wheel)
+
+### Mecanum With Raspberry Pi
+
+> [Source Code](https://github.com/CannabiZz9/Autobot_Library/tree/main/Arduino-client-mac)
 
 ```cpp
 #include "ArduinoRobot.h"
 
-// ================= PINS (MECANUM) =================
-// FL (Front Left)
-const uint8_t FL_IN1 = 12; const uint8_t FL_IN2 = 13;
-// FR (Front Right)
-const uint8_t FR_IN1 = 23; const uint8_t FR_IN2 = 22;
-// RL (Rear Left)
-const uint8_t RL_IN1 = 32; const uint8_t RL_IN2 = 33;
-// RR (Rear Right)
-const uint8_t RR_IN1 = 21; const uint8_t RR_IN2 = 19;
+// ── Pin Configuration (Mecanum) ────────────────
+const uint8_t FL_IN1 = 12; const uint8_t FL_IN2 = 13;  // Front Left
+const uint8_t FR_IN1 = 23; const uint8_t FR_IN2 = 22;  // Front Right
+const uint8_t RL_IN1 = 32; const uint8_t RL_IN2 = 33;  // Rear Left
+const uint8_t RR_IN1 = 21; const uint8_t RR_IN2 = 19;  // Rear Right
 
 // Pin Array: [FL1, FL2, FR1, FR2, RL1, RL2, RR1, RR2]
-int motorPins[] = {FL_IN1, FL_IN2, FR_IN1, FR_IN2, RL_IN1, RL_IN2, RR_IN1, RR_IN2}; 
+int motorPins[] = {FL_IN1, FL_IN2, FR_IN1, FR_IN2, RL_IN1, RL_IN2, RR_IN1, RR_IN2};
 
-// ================= SERIAL CONFIG FOR PI =================
-HardwareSerial PiSerial(2); 
+// ── Serial Configuration (Raspberry Pi) ────────
+HardwareSerial PiSerial(2);
 
 #define PI_RX_PIN 16
 #define PI_TX_PIN 17
 
-// ================= OBJECTS =================
+// ── Objects ────────────────────────────────────
 ArduinoClient robot;
 PiCommunication piComm(PiSerial, robot);
 
 void setup() {
-  // 1. Start USB Serial (For Debugging)
   Serial.begin(115200);
-  Serial.println("ESP32 Ready. Type commands to send to Pi...");
+  Serial.println("ESP32 Ready.");
 
-  // 2. Start Pi Serial
   PiSerial.begin(115200, SERIAL_8N1, PI_RX_PIN, PI_TX_PIN);
-  
-  // [CHANGE 1] Set Timeout to fix Lag
-  PiSerial.setTimeout(5); 
+  PiSerial.setTimeout(5);  // Reduce timeout to minimize lag
 
-  // [CHANGE 2] Fix init parameters
-  robot.init(DRIVE_MECANUM, motorPins, 4, 0); 
-  
+  robot.init(DRIVE_MECANUM, motorPins, 4, 0);
+
   piComm.init();
-  piComm.requestHuman();
+  piComm.requestHuman();  // Start Human Tracking immediately
 }
 
 void loop() {
-  // 3. Handle Communication
-  piComm.handle(); 
+  piComm.handle();
 }
 ```
 
+### Timed AI Sequence
 
-### 4-Wheel Mecanum Drive Robot Timing AI
-[Source Code](https://github.com/CannabiZz9/Autobot_Library/blob/main/Demo-Timing-AI/Arduino-client-mac.ino)
-follow human for 10 seconds
-then switch to follow line for 15 seconds 
-then stop
+> [Source Code](https://github.com/CannabiZz9/Autobot_Library/blob/main/Demo-Timing-AI/Arduino-client-mac.ino)
 
+This example demonstrates how to chain multiple AI modes using timers:
+
+1. **Phase 1** — Follow a human for **10 seconds**.
+2. **Phase 2** — Follow a line for **15 seconds**.
+3. **Phase 3** — Stop.
 
 ```cpp
 #include "ArduinoRobot.h"
 
-// ================= PINS (MECANUM) =================
-// FL (Front Left)
+// ── Pin Configuration (Mecanum) ────────────────
 const uint8_t FL_IN1 = 12; const uint8_t FL_IN2 = 13;
-// FR (Front Right)
 const uint8_t FR_IN1 = 23; const uint8_t FR_IN2 = 22;
-// RL (Rear Left)
 const uint8_t RL_IN1 = 32; const uint8_t RL_IN2 = 33;
-// RR (Rear Right)
 const uint8_t RR_IN1 = 21; const uint8_t RR_IN2 = 19;
 
-// Pin Array: [FL1, FL2, FR1, FR2, RL1, RL2, RR1, RR2]
-int motorPins[] = {FL_IN1, FL_IN2, FR_IN1, FR_IN2, RL_IN1, RL_IN2, RR_IN1, RR_IN2}; 
+int motorPins[] = {FL_IN1, FL_IN2, FR_IN1, FR_IN2, RL_IN1, RL_IN2, RR_IN1, RR_IN2};
 
-// ================= SERIAL CONFIG FOR PI =================
-HardwareSerial PiSerial(2); 
+// ── Serial Configuration (Raspberry Pi) ────────
+HardwareSerial PiSerial(2);
 
 #define PI_RX_PIN 16
 #define PI_TX_PIN 17
 
-// ================= OBJECTS =================
+// ── Objects ────────────────────────────────────
 ArduinoClient robot;
 PiCommunication piComm(PiSerial, robot);
 
-// Timing Variables
+// ── Timing State ───────────────────────────────
 unsigned long startTime;
 bool phaseLineStarted = false;
 bool phaseStopStarted = false;
 
 void setup() {
-  // 1. Start USB Serial (For Debugging)
   Serial.begin(115200);
-  Serial.println("ESP32 Ready. Starting Automated Sequence...");
+  Serial.println("ESP32 Ready. Starting automated sequence...");
 
-  // 2. Start Pi Serial
   PiSerial.begin(115200, SERIAL_8N1, PI_RX_PIN, PI_TX_PIN);
-  PiSerial.setTimeout(5); 
+  PiSerial.setTimeout(5);
 
-  // 3. Init Robot (Mecanum, 4 Motors, Deviation=0)
-  robot.init(DRIVE_MECANUM, motorPins, 4, 0); 
-  
-  // 4. Init Comms
+  robot.init(DRIVE_MECANUM, motorPins, 4, 0);
   piComm.init();
-  
-  // 5. START PHASE 1: Human Mode (Immediately)
-  Serial.println("PHASE 1: Human Mode (10s)");
-  // Params: speed=30, gain=0.6, boxSize=30000, deadzone=5000
+
+  // Phase 1: Start Human Tracking
+  Serial.println("PHASE 1: Human Tracking (10s)");
   piComm.requestHuman(30, 0.6, 30000, 5000);
-  
+
   startTime = millis();
 }
 
 void loop() {
-  // 1. REQUIRED: Always keep this running to receive drive commands from Pi
-  piComm.handle(); 
+  piComm.handle();
 
-  unsigned long currentTime = millis();
-  unsigned long elapsed = currentTime - startTime;
+  unsigned long elapsed = millis() - startTime;
 
-  // 2. TIMING LOGIC
-  
-  // Check if 10 seconds have passed -> Switch to Line Mode
+  // After 10s → switch to Line Tracking
   if (!phaseLineStarted && elapsed > 10000) {
-    Serial.println("PHASE 2: Switching to Line Mode (15s)");
-    // Params: speed=30, gain=0.8, thresh=100, color="black"
+    Serial.println("PHASE 2: Line Tracking (15s)");
     piComm.requestLine(30, 0.8, 100, "black");
     phaseLineStarted = true;
   }
 
-  // Check if 25 seconds have passed (10s Human + 15s Line) -> Stop
+  // After 25s (10 + 15) → stop
   if (!phaseStopStarted && elapsed > 25000) {
-    Serial.println("PHASE 3: Sequence Complete. Stopping.");
+    Serial.println("PHASE 3: Sequence complete. Stopping.");
     piComm.requestStop();
     phaseStopStarted = true;
   }
 }
 ```
 
-### 4-Wheel Mecanum Drive Robot (No Raspberry Pi)
+### Mecanum Without Raspberry Pi
+
+A minimal Mecanum sketch that drives the robot forward without AI.
+
 ```cpp
 #include "ArduinoRobot.h"
 
-// ================= PINS (MECANUM) =================
-// FL (Front Left)
+// ── Pin Configuration (Mecanum) ────────────────
 const uint8_t FL_IN1 = 12; const uint8_t FL_IN2 = 13;
-// FR (Front Right)
 const uint8_t FR_IN1 = 23; const uint8_t FR_IN2 = 22;
-// RL (Rear Left)
 const uint8_t RL_IN1 = 32; const uint8_t RL_IN2 = 33;
-// RR (Rear Right)
 const uint8_t RR_IN1 = 21; const uint8_t RR_IN2 = 19;
 
-// Pin Array: [FL1, FL2, FR1, FR2, RL1, RL2, RR1, RR2]
-int motorPins[] = {FL_IN1, FL_IN2, FR_IN1, FR_IN2, RL_IN1, RL_IN2, RR_IN1, RR_IN2}; 
+int motorPins[] = {FL_IN1, FL_IN2, FR_IN1, FR_IN2, RL_IN1, RL_IN2, RR_IN1, RR_IN2};
 
-// ================= OBJECTS =================
+// ── Objects ────────────────────────────────────
 ArduinoClient robot;
 
 void setup() {
-  //1. Init Robot (Mecanum, 4 Motors, Deviation=0)
-  robot.init(DRIVE_MECANUM, motorPins, 4, 0); 
-  
+  robot.init(DRIVE_MECANUM, motorPins, 4, 0);
 }
 
 void loop() {
-  robot.drive(100,0,0);
+  // Drive forward at full speed
+  robot.drive(100, 0, 0);
 }
 ```
 
-## LineTrackRequest
+---
 
-```piComm.requestLine(30, 0.8, 100, "black");```
-anywhere in loop (if,else,while,timings,conditions) robot will follow line
+## AI Mode Quick Reference
 
-## HumanTrackRequest
+You can call these functions anywhere in your `loop()` — inside `if`, `else`, `while`, timers, or conditional blocks.
 
-```piComm.requestHuman(30, 0.6, 30000, 5000);```
-anywhere in loop (if,else,while,timings,conditions) robot will follow Human
+### Line Tracking
+
+```cpp
+piComm.requestLine(30, 0.8, 100, "black");
+```
+
+The robot will begin following a line. See the [API Reference](/docs/ai/reference) for full parameter details.
+
+### Human Tracking
+
+```cpp
+piComm.requestHuman(30, 0.6, 30000, 5000);
+```
+
+The robot will begin following a detected human. See the [API Reference](/docs/ai/reference) for full parameter details.
