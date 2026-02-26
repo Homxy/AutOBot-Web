@@ -1,0 +1,134 @@
+# การตั้งค่าขั้นสูง
+
+คู่มือนี้ครอบคลุมวิธีการเชื่อมต่อโดยตรงกับ Raspberry Pi เพื่อการพัฒนา และวิธีจัดการ Background Service ที่ใช้รัน AI Client
+
+---
+
+## การเชื่อมต่อผ่าน Mobile Hotspot
+
+### ขั้นตอนที่ 1 — สร้าง Hotspot
+
+สร้าง Mobile Hotspot บนอุปกรณ์ของคุณด้วยข้อมูลด้านล่าง Raspberry Pi ถูกตั้งค่าไว้ล่วงหน้าให้เชื่อมต่อกับเครือข่ายนี้โดยอัตโนมัติ
+
+| การตั้งค่า | ค่า |
+| :--- | :--- |
+| **SSID** | `!autobot` |
+| **Password** | `zxcv12345` |
+
+![การตั้งค่า Hotspot](/assets/ai/4.jpg)
+
+### ขั้นตอนที่ 2 — ตรวจสอบการเชื่อมต่อ
+
+1. เชื่อมต่อคอมพิวเตอร์ของคุณกับเครือข่าย WiFi `!autobot`
+2. เปิดเครื่อง Raspberry Pi
+3. สังเกต **ไฟ LED สถานะ WiFi** บน Pi เพื่อยืนยันว่าเชื่อมต่อสำเร็จแล้ว
+
+### ขั้นตอนที่ 3 — เชื่อมต่อผ่าน SSH
+
+เมื่ออุปกรณ์ทั้งสองอยู่ในเครือข่ายเดียวกันแล้ว ให้เปิด Terminal แล้วเชื่อมต่อ:
+
+```bash
+ssh autobot@autobot-pi
+```
+
+เมื่อถูกถาม ให้ใส่รหัสผ่านของผู้ใช้ `autobot` (กดปุ่ม Space Bar หนึ่งครั้ง)
+
+### ขั้นตอนที่ 4 — ค้นหาไฟล์ Client Script
+
+ไฟล์ Python หลักอยู่ที่:
+
+```
+~/Autobot/pi-client.py
+```
+
+เส้นทางเต็ม: `/home/autobot/Autobot/pi-client.py`
+
+---
+
+## การจัดการ Service (systemd)
+
+AI Client ทำงานเป็น `systemd` Background Service ชื่อ `pi-client.service` คำสั่งทั้งหมดด้านล่างควรรันผ่าน SSH บน Raspberry Pi
+
+### สร้างหรือแก้ไขไฟล์ Service
+
+สร้าง Service Unit File ใหม่หรือแก้ไขไฟล์ที่มีอยู่:
+
+```bash
+sudo nano /etc/systemd/system/pi-client.service
+```
+
+> **เคล็ดลับ:** ใน `nano` กด `Ctrl + O` เพื่อบันทึกไฟล์ จากนั้นกด `Ctrl + X` เพื่อออก
+
+### ลงทะเบียนและเปิดใช้งาน Service
+
+หลังจากสร้างหรือแก้ไขไฟล์ Service แล้ว ให้ Reload `systemd` และเปิดใช้งาน Service ให้เริ่มทำงานเมื่อบูต:
+
+```bash
+# Reload systemd เพื่อรับรู้การเปลี่ยนแปลงการตั้งค่า
+sudo systemctl daemon-reload
+
+# เปิดใช้งานการเริ่มต้นอัตโนมัติเมื่อบูต
+sudo systemctl enable pi-client.service
+
+# เริ่ม Service ทันที
+sudo systemctl start pi-client.service
+```
+
+### ตรวจสอบสถานะ Service
+
+```bash
+sudo systemctl status pi-client.service
+```
+
+| สถานะ | ความหมาย |
+| :--- | :--- |
+| ✅ **Active (running)** | Service กำลังทำงานปกติ |
+| ❌ **Failed / Inactive** | Service หยุดทำงานหรือเกิดข้อผิดพลาด — ตรวจสอบ Log ด้านล่าง |
+
+### ดู Log
+
+ใช้ `journalctl` เพื่อดูผลลัพธ์แบบ Real-time จาก Service (รวมถึงคำสั่ง `print()` และข้อผิดพลาดของ Python):
+
+```bash
+journalctl -u pi-client.service -n 50 -f
+```
+
+กด `Ctrl + C` เพื่อออกจากการดู Log แบบสด
+
+### รีสตาร์ทหลังแก้ไขโค้ด
+
+หากคุณแก้ไข `pi-client.py` จะต้องรีสตาร์ท Service เพื่อให้การเปลี่ยนแปลงมีผล:
+
+```bash
+sudo systemctl restart pi-client.service
+```
+
+---
+
+## การโอนไฟล์ (SCP)
+
+ใช้ **SCP (Secure Copy Protocol)** เพื่อโอนไฟล์จากคอมพิวเตอร์ไปยัง Raspberry Pi รันคำสั่งเหล่านี้จาก **เครื่องของคุณ** ไม่ใช่จาก Pi
+
+### รูปแบบคำสั่ง
+
+```bash
+scp <local-file> autobot@autobot-pi:<remote-path>
+```
+
+### ตัวอย่าง
+
+โอนไฟล์ชื่อ `new_script.py` จากโฟลเดอร์ Downloads ไปยัง Pi:
+
+**Windows:**
+
+```bash
+scp C:\Users\YourName\Downloads\new_script.py autobot@autobot-pi:~/Autobot/
+```
+
+**macOS / Linux:**
+
+```bash
+scp ~/Downloads/new_script.py autobot@autobot-pi:~/Autobot/
+```
+
+คุณจะถูกถามรหัสผ่านของผู้ใช้ `autobot` ความคืบหน้าการโอนจะแสดงใน Terminal

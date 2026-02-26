@@ -1,0 +1,253 @@
+# ตัวอย่าง
+
+หน้านี้มี Sketch ที่พร้อมใช้งานสำหรับการตั้งค่า Autobot ทั่วไป แต่ละตัวอย่างสาธิตประเภทการขับเคลื่อนและชุดฟีเจอร์ที่แตกต่างกัน
+
+## การติดตั้ง
+
+1. ดาวน์โหลด [`ArduinoRobot.h`](https://github.com/CannabiZz9/Autobot_Library/blob/main/ArduinoRobot.h)
+2. วางไฟล์ในโฟลเดอร์โปรเจกต์ Arduino ของคุณ
+3. เพิ่มไว้ที่ด้านบนของ Sketch:
+
+```cpp
+#include "ArduinoRobot.h"
+```
+
+---
+
+## Differential Drive (2 ล้อ)
+
+### Differential พร้อม Raspberry Pi
+
+> [ซอร์สโค้ด](https://github.com/CannabiZz9/Autobot_Library/tree/main/Arduino-client-diff)
+
+```cpp
+#include "ArduinoRobot.h"
+
+// ── การตั้งค่าขา ──────────────────────────
+int motorPins[] = {18, 19, 22, 23};
+
+// ── การตั้งค่า Serial (Raspberry Pi) ────────
+HardwareSerial PiSerial(2);
+
+#define PI_RX_PIN 16
+#define PI_TX_PIN 17
+
+// ── ออบเจกต์ ────────────────────────────────
+ArduinoClient robot;
+PiCommunication piComm(PiSerial, robot);
+
+void setup() {
+  // เริ่ม USB Serial สำหรับ Debugging
+  Serial.begin(115200);
+  Serial.println("ESP32 Ready.");
+
+  // เริ่มการสื่อสาร Serial กับ Pi
+  PiSerial.begin(115200, SERIAL_8N1, PI_RX_PIN, PI_TX_PIN);
+
+  // เริ่มต้นหุ่นยนต์ (Differential, 2 มอเตอร์, ไม่มีค่าเบี่ยงเบน)
+  robot.init(DRIVE_DIFFERENTIAL, motorPins, 2, 0);
+
+  // เริ่มต้น Communication Handler
+  piComm.init();
+}
+
+void loop() {
+  piComm.handle();
+}
+```
+
+### Differential ไม่มี Raspberry Pi
+
+Sketch ขั้นต่ำที่ขับเคลื่อนหุ่นยนต์ไปข้างหน้าโดยไม่ใช้ฟีเจอร์ AI
+
+```cpp
+#include "ArduinoRobot.h"
+
+// ── การตั้งค่าขา ──────────────────────────
+int motorPins[] = {18, 19, 22, 23};
+
+// ── ออบเจกต์ ────────────────────────────────
+ArduinoClient robot;
+
+void setup() {
+  // เริ่มต้นหุ่นยนต์ (Differential, 2 มอเตอร์, ไม่มีค่าเบี่ยงเบน)
+  robot.init(DRIVE_DIFFERENTIAL, motorPins, 2, 0);
+}
+
+void loop() {
+  // ขับเคลื่อนไปข้างหน้าด้วยความเร็วเต็ม
+  robot.drive(100, 0, 0);
+}
+```
+
+---
+
+## Mecanum Drive (4 ล้อ)
+
+### Mecanum พร้อม Raspberry Pi
+
+> [ซอร์สโค้ด](https://github.com/CannabiZz9/Autobot_Library/tree/main/Arduino-client-mac)
+
+```cpp
+#include "ArduinoRobot.h"
+
+// ── การตั้งค่าขา (Mecanum) ────────────────
+const uint8_t FL_IN1 = 12; const uint8_t FL_IN2 = 13;  // หน้าซ้าย
+const uint8_t FR_IN1 = 23; const uint8_t FR_IN2 = 22;  // หน้าขวา
+const uint8_t RL_IN1 = 32; const uint8_t RL_IN2 = 33;  // หลังซ้าย
+const uint8_t RR_IN1 = 21; const uint8_t RR_IN2 = 19;  // หลังขวา
+
+// อาร์เรย์ขา: [FL1, FL2, FR1, FR2, RL1, RL2, RR1, RR2]
+int motorPins[] = {FL_IN1, FL_IN2, FR_IN1, FR_IN2, RL_IN1, RL_IN2, RR_IN1, RR_IN2};
+
+// ── การตั้งค่า Serial (Raspberry Pi) ────────
+HardwareSerial PiSerial(2);
+
+#define PI_RX_PIN 16
+#define PI_TX_PIN 17
+
+// ── ออบเจกต์ ────────────────────────────────
+ArduinoClient robot;
+PiCommunication piComm(PiSerial, robot);
+
+void setup() {
+  Serial.begin(115200);
+  Serial.println("ESP32 Ready.");
+
+  PiSerial.begin(115200, SERIAL_8N1, PI_RX_PIN, PI_TX_PIN);
+  PiSerial.setTimeout(5);  // ลด Timeout เพื่อลดความหน่วง
+
+  robot.init(DRIVE_MECANUM, motorPins, 4, 0);
+
+  piComm.init();
+  piComm.requestHuman();  // เริ่ม Human Tracking ทันที
+}
+
+void loop() {
+  piComm.handle();
+}
+```
+
+### ลำดับ AI แบบจับเวลา
+
+> [ซอร์สโค้ด](https://github.com/CannabiZz9/Autobot_Library/blob/main/Demo-Timing-AI/Arduino-client-mac.ino)
+
+ตัวอย่างนี้สาธิตวิธีการเรียงลำดับโหมด AI หลายโหมดโดยใช้ Timer:
+
+1. **เฟส 1** — ติดตามมนุษย์เป็นเวลา **10 วินาที**
+2. **เฟส 2** — ติดตามเส้นเป็นเวลา **15 วินาที**
+3. **เฟส 3** — หยุด
+
+```cpp
+#include "ArduinoRobot.h"
+
+// ── การตั้งค่าขา (Mecanum) ────────────────
+const uint8_t FL_IN1 = 12; const uint8_t FL_IN2 = 13;
+const uint8_t FR_IN1 = 23; const uint8_t FR_IN2 = 22;
+const uint8_t RL_IN1 = 32; const uint8_t RL_IN2 = 33;
+const uint8_t RR_IN1 = 21; const uint8_t RR_IN2 = 19;
+
+int motorPins[] = {FL_IN1, FL_IN2, FR_IN1, FR_IN2, RL_IN1, RL_IN2, RR_IN1, RR_IN2};
+
+// ── การตั้งค่า Serial (Raspberry Pi) ────────
+HardwareSerial PiSerial(2);
+
+#define PI_RX_PIN 16
+#define PI_TX_PIN 17
+
+// ── ออบเจกต์ ────────────────────────────────
+ArduinoClient robot;
+PiCommunication piComm(PiSerial, robot);
+
+// ── สถานะการจับเวลา ───────────────────────
+unsigned long startTime;
+bool phaseLineStarted = false;
+bool phaseStopStarted = false;
+
+void setup() {
+  Serial.begin(115200);
+  Serial.println("ESP32 Ready. Starting automated sequence...");
+
+  PiSerial.begin(115200, SERIAL_8N1, PI_RX_PIN, PI_TX_PIN);
+  PiSerial.setTimeout(5);
+
+  robot.init(DRIVE_MECANUM, motorPins, 4, 0);
+  piComm.init();
+
+  // เฟส 1: เริ่ม Human Tracking
+  Serial.println("PHASE 1: Human Tracking (10s)");
+  piComm.requestHuman(30, 0.6, 30000, 5000);
+
+  startTime = millis();
+}
+
+void loop() {
+  piComm.handle();
+
+  unsigned long elapsed = millis() - startTime;
+
+  // หลังจาก 10 วินาที → เปลี่ยนเป็น Line Tracking
+  if (!phaseLineStarted && elapsed > 10000) {
+    Serial.println("PHASE 2: Line Tracking (15s)");
+    piComm.requestLine(30, 0.8, 100, "black");
+    phaseLineStarted = true;
+  }
+
+  // หลังจาก 25 วินาที (10 + 15) → หยุด
+  if (!phaseStopStarted && elapsed > 25000) {
+    Serial.println("PHASE 3: Sequence complete. Stopping.");
+    piComm.requestStop();
+    phaseStopStarted = true;
+  }
+}
+```
+
+### Mecanum ไม่มี Raspberry Pi
+
+Sketch Mecanum ขั้นต่ำที่ขับเคลื่อนหุ่นยนต์ไปข้างหน้าโดยไม่ใช้ AI
+
+```cpp
+#include "ArduinoRobot.h"
+
+// ── การตั้งค่าขา (Mecanum) ────────────────
+const uint8_t FL_IN1 = 12; const uint8_t FL_IN2 = 13;
+const uint8_t FR_IN1 = 23; const uint8_t FR_IN2 = 22;
+const uint8_t RL_IN1 = 32; const uint8_t RL_IN2 = 33;
+const uint8_t RR_IN1 = 21; const uint8_t RR_IN2 = 19;
+
+int motorPins[] = {FL_IN1, FL_IN2, FR_IN1, FR_IN2, RL_IN1, RL_IN2, RR_IN1, RR_IN2};
+
+// ── ออบเจกต์ ────────────────────────────────
+ArduinoClient robot;
+
+void setup() {
+  robot.init(DRIVE_MECANUM, motorPins, 4, 0);
+}
+
+void loop() {
+  // ขับเคลื่อนไปข้างหน้าด้วยความเร็วเต็ม
+  robot.drive(100, 0, 0);
+}
+```
+
+---
+
+## คู่มือด่วนโหมด AI
+
+คุณสามารถเรียกฟังก์ชันเหล่านี้ได้ทุกที่ใน `loop()` — ภายใน `if`, `else`, `while`, Timer หรือบล็อกเงื่อนไขอื่นๆ
+
+### การติดตามเส้น
+
+```cpp
+piComm.requestLine(30, 0.8, 100, "black");
+```
+
+หุ่นยนต์จะเริ่มติดตามเส้น ดูรายละเอียดพารามิเตอร์ทั้งหมดที่ [อ้างอิง API](/docs/ai/reference_th)
+
+### การติดตามมนุษย์
+
+```cpp
+piComm.requestHuman(30, 0.6, 30000, 5000);
+```
+
+หุ่นยนต์จะเริ่มติดตามมนุษย์ที่ตรวจพบ ดูรายละเอียดพารามิเตอร์ทั้งหมดที่ [อ้างอิง API](/docs/ai/reference_th)

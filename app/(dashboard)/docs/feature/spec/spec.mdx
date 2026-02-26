@@ -1,0 +1,126 @@
+# Technical Specifications
+
+Complete technical specifications for each robot component used in the Autobot project.
+
+---
+
+## Microcontroller — ESP32
+
+The ESP32 serves as the main control unit for the robot.
+
+| Specification | Value |
+| :--- | :--- |
+| **Supported Models** | ESP32 DevKitC, ESP32 NodeMCU |
+| **Processor** | Dual-core Xtensa LX6, up to 240 MHz |
+| **Connectivity** | Wi-Fi 802.11 b/g/n, Bluetooth 4.2 |
+| **GPIO Pins** | Up to 34 programmable GPIOs |
+| **Communication** | UART, SPI, I2C, PWM |
+| **Operating Voltage** | 3.3V (input 5V via USB or VIN) |
+| **Flash Memory** | 4 MB |
+
+---
+
+## Motors
+
+The system supports **any DC Motor** that can be controlled via an H-Bridge driver. While TT Motors are commonly used for beginners, you are not limited to them.
+
+| Specification | Value / Requirement |
+| :--- | :--- |
+| **Supported Types** | Any DC Gear Motor, DC Brush Motor (e.g., TT Motor, N20, JGA25) |
+| **Operating Voltage** | Must match your Motor Driver's limit (e.g., 2.5V – 12V for L9110S) |
+| **Current Draw** | Must not exceed your Motor Driver's max current (e.g., < 800mA for L9110S) |
+| **Control Method** | PWM for speed, digital signal for direction (via H-Bridge input) |
+| **Encoder Support** | Optional. Supported if your MCU has enough GPIO pins for reading encoder signals |
+
+---
+
+## Motor Driver — L9110S
+
+| Specification | 2-Channel | 4-Channel |
+| :--- | :--- | :--- |
+| **Type** | Dual H-Bridge | Quad H-Bridge |
+| **Operating Voltage** | 2.5V – 12V | 2.5V – 12V |
+| **Max Current Per Channel** | 800 mA | 800 mA |
+| **Control Method** | PWM for speed, digital for direction | PWM for speed, digital for direction |
+| **Motors Supported** | 2 DC motors | 4 DC motors |
+| **Suitable For** | 2-wheel, 3-wheel robots | 4-wheel robots |
+
+> **Note:** You can use other H-Bridge motor drivers (e.g., L298N, TB6612FNG) as long as you wire them correctly to the ESP32 and adjust your power requirements.
+
+---
+
+## Wheels
+
+You can use **any wheel type** that fits your chosen motors and robot structure. The configuration code can be adapted to handle different kinematics.
+
+| Expected Wheel Type | Common Uses | Key Kinematic Feature |
+| :--- | :--- | :--- |
+| **Standard / Rubber (Differential)** | 2W, 4W | Forward/backward, differential turning |
+| **Omni Wheel** | 3W | Multi-directional movement |
+| **Mecanum Wheel** | 4W | Omnidirectional (including sideways) |
+| **Caster / Ball Wheel** | Support | Free rotation, balance support for 2-wheel setups |
+
+---
+
+## Control Board — Custom PCB
+
+| Specification | Value |
+| :--- | :--- |
+| **Compatible MCUs** | ESP32 DevKitC, ESP32 NodeMCU |
+| **Co-Processor Support** | Raspberry Pi 5 |
+| **Sections** | Power, Control, Status LEDs |
+| **LED Indicators** | 🔴 Power, 🟢 Wi-Fi, 🟡 Running, ⚪ Auxiliary |
+| **Motor Driver Input** | Supports L9110S (2-ch or 4-ch) |
+| **Mounting** | Compatible with Raspberry Pi 5 mounting holes |
+
+---
+
+## Power Supply
+
+| Source | Voltage | Step-Down Required | Notes |
+| :--- | :--- | :--- | :--- |
+| **18650 Li-Ion** | 3.7V – 4.2V (per cell) | ✅ Yes | Compact, rechargeable |
+| **AA Batteries** | 1.5V per cell | ✅ Yes (series) | Easy to find |
+| **Power Bank** | 5V | ❌ No | Direct connection |
+| **Li-Po Battery** | 3.7V – 7.4V | ✅ Yes | High current, lightweight |
+
+> **Important:** The system requires **5V DC** input. Always use a Step-Down converter if your power source exceeds 5V.
+
+---
+
+## Co-Processor — Raspberry Pi 5
+
+| Specification | Value |
+| :--- | :--- |
+| **Processor** | Broadcom BCM2712, Quad-core Cortex-A76 @ 2.4GHz |
+| **RAM** | 4GB / 8GB LPDDR4X |
+| **Connectivity** | Wi-Fi 5, Bluetooth 5.0, Gigabit Ethernet |
+| **Camera** | CSI connector / USB camera support |
+| **AI Capability** | YOLOv8 object detection, line tracking |
+| **Communication** | UART (GPIO 14/15) to ESP32 |
+| **Power** | 5V / 5A via USB-C |
+
+---
+
+## Camera Module
+
+| Specification | Value |
+| :--- | :--- |
+| **Supported Types** | USB Webcam, Raspberry Pi Camera Module |
+| **Resolution** | 1080p recommended |
+| **Interface** | USB or CSI |
+| **Use Cases** | Human tracking, line tracking, object detection |
+| **Requires** | Raspberry Pi 5 |
+
+---
+
+## Robot Configurations Summary
+
+| Configuration | Wheels | Motors | Driver | Drive Type |
+| :--- | :--- | :--- | :--- | :--- |
+| **2-Wheel Rectangular** | 2× Rubber + 1× Caster | 2× TT Motor | L9110S 2-ch | Differential |
+| **2-Wheel Circular** | 2× Rubber + 1× Caster | 2× TT Motor | L9110S 2-ch | Differential |
+| **3-Wheel** | 3× Omni | 3× TT Motor | L9110S 4-ch | Omni |
+| **4-Wheel Differential** | 4× Rubber | 4× TT Motor | L9110S 4-ch | Differential |
+| **4-Wheel Mecanum** | 4× Mecanum | 4× TT Motor | L9110S 4-ch | Mecanum |
+| **Double-Decker** | Same as base | Same as base | Same as base | Same as base |

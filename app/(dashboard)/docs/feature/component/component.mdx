@@ -1,0 +1,119 @@
+# Component List
+
+Complete list of all components needed to build an Autobot robot, organized by category.
+
+---
+
+## Essential Components
+
+These components are required for all robot configurations.
+
+### Microcontroller
+
+| Component | Quantity | Notes |
+| :--- | :--- | :--- |
+| **ESP32 DevKitC** or **ESP32 NodeMCU** | 1 | Main controller — choose one based on your PCB slot |
+
+### Motors
+
+| Component | Quantity | Notes |
+| :--- | :--- | :--- |
+| **DC Motor** | 2 – 4 | Any DC motor compatible with H-Bridge (e.g., TT Motor, N20). Choose with or without Encoder. |
+
+> Choose motor quantity based on your robot configuration: 2-wheel (2 motors), 3-wheel (3 motors), or 4-wheel (4 motors). Ensure the motor's voltage and current ratings match your chosen motor driver.
+
+### Motor Driver
+
+| Component | Quantity | Notes |
+| :--- | :--- | :--- |
+| **L9110S 2-Channel** | 1 | For 2-wheel or 3-wheel robots |
+| **L9110S 4-Channel** | 1 | For 4-wheel robots or 3-wheel robots |
+
+### Control Board
+
+| Component | Quantity | Notes |
+| :--- | :--- | :--- |
+| **Custom PCB** | 1 | Simplifies wiring; supports ESP32 + Raspberry Pi 5 |
+
+### Power
+
+| Component | Quantity | Notes |
+| :--- | :--- | :--- |
+| **Power source (5V)** | 1 | Choose: 18650 battery, AA batteries, Power Bank, or Li-Po |
+| **Step-Down Converter** | 0 – 1 | Required if power source exceeds 5V |
+
+### Structure
+
+| Component | Quantity | Notes |
+| :--- | :--- | :--- |
+| **Robot Base (from Blueprint)** | 1 | Cut from acrylic, metal, plywood, or other material |
+| **Screws & Standoffs** | As needed | M3 screws recommended |
+
+---
+
+## Wheels (Choose by Configuration)
+
+| Configuration | Wheels Needed | Quantity |
+| :--- | :--- | :--- |
+| **2-Wheel** | Rubber wheels + Caster wheel | 2 + 1 |
+| **3-Wheel** | Omni wheels | 3 |
+| **4-Wheel Differential** | Rubber wheels | 4 |
+| **4-Wheel Mecanum** | Mecanum wheels | 4 |
+
+---
+
+## Optional Components (AI & Vision)
+
+These components are needed only if you want to use AI features such as Human Tracking and Line Tracking.
+
+| Component | Quantity | Notes |
+| :--- | :--- | :--- |
+| **Raspberry Pi 5** | 1 | For image processing and AI |
+| **Camera Module** | 1 | USB Webcam or Raspberry Pi Camera Module |
+| **Jumper Wires (UART)** | 3 | RX, TX, GND — between ESP32 and Raspberry Pi |
+| **SD Card** | 1 | For Raspberry Pi OS image |
+| **USB-C Power Supply (5V/5A)** | 1 | For Raspberry Pi 5 |
+
+---
+
+## Wiring & Accessories
+
+| Component | Quantity | Notes |
+| :--- | :--- | :--- |
+| **Jumper wires** | As needed | For motor-to-driver and driver-to-ESP32 connections |
+| **Double-sided tape** | As needed | Alternative mounting method |
+| **Battery holder** | 0 – 1 | If using 18650 or AA batteries |
+| **Switch** | 0 – 1 | Recommended for easy power on/off |
+
+---
+
+## Shopping List by Configuration
+
+### Minimal (2-Wheel, No AI)
+
+| # | Component | Qty |
+| :--- | :--- | :--- |
+| 1 | ESP32 (DevKitC or NodeMCU) | 1 |
+| 2 | TT Motor | 2 |
+| 3 | Rubber wheels | 2 |
+| 4 | Caster wheel | 1 |
+| 5 | L9110S 2-Channel driver | 1 |
+| 6 | Custom PCB | 1 |
+| 7 | Power source (5V) | 1 |
+| 8 | Robot base (Blueprint) | 1 |
+
+### Full (4-Wheel Mecanum + AI)
+
+| # | Component | Qty |
+| :--- | :--- | :--- |
+| 1 | ESP32 (DevKitC or NodeMCU) | 1 |
+| 2 | TT Motor (with Encoder) | 4 |
+| 3 | Mecanum wheels | 4 |
+| 4 | L9110S 4-Channel driver | 1 |
+| 5 | Custom PCB | 1 |
+| 6 | Power source + Step-Down | 1 |
+| 7 | Raspberry Pi 5 | 1 |
+| 8 | Camera Module | 1 |
+| 9 | UART jumper wires | 3 |
+| 10 | SD Card | 1 |
+| 11 | Robot base (Blueprint) | 1 |

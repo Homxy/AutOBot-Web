@@ -1,0 +1,106 @@
+# เริ่มต้นใช้งาน
+
+Autobot Library เป็นไลบรารี Arduino แบบโมดูลาร์ที่ออกแบบมาเพื่อทำให้การพัฒนาหุ่นยนต์เคลื่อนที่ง่ายขึ้น มันจัดการ Kinematics ที่ซับซ้อนสำหรับการขับเคลื่อนหลายรูปแบบ และมี Communication Handler ในตัวสำหรับ AI Coprocessor เช่น Raspberry Pi และ Jetson Nano
+
+## ความต้องการ
+
+### Arduino (การควบคุมพื้นฐาน)
+
+ฮาร์ดแวร์และซอฟต์แวร์ที่จำเป็นสำหรับการเคลื่อนที่ของหุ่นยนต์พื้นฐานโดยไม่ใช้ฟีเจอร์ AI
+
+#### ฮาร์ดแวร์
+
+| ส่วนประกอบ | คำแนะนำ |
+| :--- | :--- |
+| **ไมโครคอนโทรลเลอร์** | บอร์ดพัฒนา ESP32 (แนะนำเพราะรองรับ `HardwareSerial`) |
+| **ไดรเวอร์มอเตอร์** | ไดรเวอร์ที่รองรับ PWM (เช่น L298N, TB6612FNG) |
+| **มอเตอร์** | มอเตอร์ DC 2 หรือ 4 ตัว ขึ้นอยู่กับประเภทการขับเคลื่อน |
+| **แหล่งจ่ายไฟ** | แบตเตอรี่ Li-ion 2S หรือ 3S ที่เหมาะกับมอเตอร์ของคุณ |
+
+#### ซอฟต์แวร์
+
+* [Arduino IDE](https://www.arduino.cc/en/software) — แนะนำเวอร์ชันล่าสุด
+* [`ArduinoRobot.h`](https://github.com/CannabiZz9/Autobot_Library/blob/main/ArduinoRobot.h) — ไฟล์ Header หลักของไลบรารี ต้องวางไว้ในโฟลเดอร์โปรเจกต์
+
+---
+
+### Arduino + Raspberry Pi (AI & Vision)
+
+ส่วนเพิ่มเติมที่จำเป็นสำหรับการเปิดใช้งานฟีเจอร์ Human Tracking และ Line Tracking
+
+#### ฮาร์ดแวร์
+
+| ส่วนประกอบ | คำแนะนำ |
+| :--- | :--- |
+| **Single-Board Computer** | Raspberry Pi 4 หรือ 5 (แนะนำสำหรับประสิทธิภาพ YOLOv8) |
+| **กล้อง** | USB Webcam หรือ Raspberry Pi Camera Module |
+| **การเชื่อมต่อ** | สายจัมเปอร์ 3 เส้นสำหรับ UART (RX, TX, GND) |
+
+---
+
+## การตั้งค่า Raspberry Pi Image
+
+เพื่อใช้งานฟีเจอร์ AI (Human / Line Tracking) ให้เขียน OS Image ที่ตั้งค่าไว้ล่วงหน้าลงบน SD Card
+
+**1. ดาวน์โหลด Image:**
+
+[Autobot Raspberry Pi Image (.bin)](https://archive.org/details/autobot_202602)
+
+![ดาวน์โหลดไฟล์ .bin image](/assets/ai/0.png)
+
+**2. ติดตั้งเครื่องมือเขียน:**
+
+ดาวน์โหลดและติดตั้ง [balenaEtcher](https://etcher.balena.io)
+
+**3. เขียนลง SD Card:**
+
+ใส่ SD Card เลือกไฟล์ `.bin` Image ที่ดาวน์โหลด แล้วคลิก **Flash!**
+
+![เลือกไฟล์ Image](/assets/ai/1.png)
+![เลือก SD Card](/assets/ai/2.png)
+![คลิก Flash](/assets/ai/3.png)
+
+---
+
+## แผนผังการต่อสาย
+
+เชื่อมต่อ ESP32 กับ GPIO Header ของ Raspberry Pi ตามตำแหน่งขาดังนี้:
+
+| สัญญาณ | ขา ESP32 | ขา Raspberry Pi |
+| :--- | :--- | :--- |
+| **RX** | GPIO 16 | GPIO 14 (TXD) |
+| **TX** | GPIO 17 | GPIO 15 (RXD) |
+| **GND** | GND | GND |
+
+---
+
+## Arduino Sketch ขั้นต่ำ
+
+ใส่โค้ดต่อไปนี้ในไฟล์ `.ino` ของคุณเพื่อสร้างการสื่อสารกับ Raspberry Pi:
+
+```cpp
+#include <ArduinoRobot.h>
+
+// ขา UART ที่เชื่อมต่อกับ Raspberry Pi
+#define PI_RX_PIN 16
+#define PI_TX_PIN 17
+
+// สร้างออบเจกต์ไลบรารี
+ArduinoClient robot;
+PiCommunication piComm(PiSerial, robot);
+
+void setup() {
+  // เริ่มต้นการสื่อสาร Serial กับ Raspberry Pi
+  PiSerial.begin(115200, SERIAL_8N1, PI_RX_PIN, PI_TX_PIN);
+
+  // เริ่มต้น Communication Handler
+  piComm.init();
+}
+
+void loop() {
+  // ประมวลผลคำสั่งที่ได้รับจาก Raspberry Pi
+  piComm.handle();
+}
+```
+
+> สำหรับตัวอย่างเต็มและการตั้งค่าการขับเคลื่อนขั้นสูง ดูที่หน้า [ตัวอย่าง](/docs/ai/demo_th)
