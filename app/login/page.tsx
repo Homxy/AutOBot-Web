@@ -18,18 +18,6 @@ export default function SignInPage() {
             <GoogleLogo />
             <span>Sign in with Google</span>
           </Button>
-
-          <Button onClick={() => {signIn("facebook", {callbackUrl: "/"})}}>
-            <FacebookLogo />
-            <span>Sign in with Facebook</span>
-          </Button>
-
-          <Button onClick={() => {}}>
-            <MicrosoftLogo />
-            <span>Sign in with Microsoft</span>
-          </Button>
-
-          {/* <div className="border-t border-gray-200 my-1"></div> */}
           
         </div>
       </div>

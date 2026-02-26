@@ -62,6 +62,10 @@ export async function GET(req: Request) {
         where: {
             authorId: Number(session.id),
         },
+        orderBy: {
+            updatedAt: 'desc',
+        },
+        
         });
 
         return NextResponse.json(workspaces);

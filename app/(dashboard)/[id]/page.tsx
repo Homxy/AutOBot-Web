@@ -4,8 +4,9 @@ import * as Blockly from "blockly/core";
 import "blockly/blocks"; 
 import * as En from "blockly/msg/en";
 import { ArduinoGenerator } from "@/blockly/generator/ArduinoGenerator";
-import BlocklyToolBox from "@/blockly/toolbox/BlocklyToolBox";
-import { Download, FolderOpen, Trash2, Save } from 'lucide-react';
+import BlocklyToolBoxLogic from "@/blockly/toolbox/BlocklyToolBoxLogic";
+import BlocklyToolBoxAppearence from "@/blockly/toolbox/BlocklyToolBoxAppearence";
+import { Download, FolderOpen, Trash2, Save, ChevronDown } from 'lucide-react';
 
 export default function BlocklyPage({ params }: { params: Promise<{ id: string }> }) {
     const blocklyDivRef = useRef<HTMLDivElement | null>(null);
@@ -13,7 +14,10 @@ export default function BlocklyPage({ params }: { params: Promise<{ id: string }
     const fileInputRef = useRef<HTMLInputElement | null>(null);
     const [code, setCode] = useState<string>("// Code will appear here…\n");
     const [name, setName] = useState("");
+    const [Ports, setPorts] = useState<any[]>([]);
+    const [selectPort, setSelectPort] = useState<string>("");
     let autosaveTimer: NodeJS.Timeout;
+
 
     const onWorkSpaceChange = (id: string) => {
         clearTimeout(autosaveTimer);
@@ -30,7 +34,7 @@ export default function BlocklyPage({ params }: { params: Promise<{ id: string }
             } catch (err) {
                 console.error("save failed", err);
             }
-        }, 2000); 
+        }, 10000); 
     };
 
     const fetchName = async (id: string) => {
@@ -44,7 +48,40 @@ export default function BlocklyPage({ params }: { params: Promise<{ id: string }
             console.error("Failed to fetch", error);
         }
     };
-    
+
+    const initPorts = async () => {
+        const arduinoPort = await fetch("/api/getport");
+        const portsData = await arduinoPort.json();
+        console.log("Initial ports:", portsData);
+        setPorts(portsData);
+    };
+
+    const getPorts = async () => {
+        const ports = await (navigator as any).serial.getPorts();
+
+        (navigator as any).serial.addEventListener("connect", async (event: any) => {
+            console.log("Serial port connected event detected");
+            const serialPort = event.target;
+            const serialPortInfo = serialPort.getInfo();
+            const arduinoPort = await fetch("/api/getport");
+            const portsData = await arduinoPort.json();
+            portsData.forEach((p: any) => {
+                setPorts((prevPorts) => [...prevPorts, p]);
+            });
+        });
+
+        (navigator as any).serial.addEventListener("disconnect", async (event: any) => {
+            console.log("Serial port disconnected event detected");
+            const serialPort = event.target;
+            const serialPortInfo = serialPort.getInfo();
+            setPorts(prevPorts => prevPorts.filter(p => {
+                return !(Number.parseInt(p.vid, 16) === serialPortInfo.usbVendorId && Number.parseInt(p.pid, 16) === serialPortInfo.usbProductId);
+            }));
+        });
+    };
+
+
+
     useEffect(() => {
         params.then(p => {
             fetchName(p.id);
@@ -54,140 +91,14 @@ export default function BlocklyPage({ params }: { params: Promise<{ id: string }
 
     useEffect(() => {
     if (!blocklyDivRef.current) return;
+    initPorts();
+    getPorts();
+    BlocklyToolBoxLogic();
 
-    // 1. Initialize custom blocks and messages
-    BlocklyToolBox();
     Object.assign(Blockly.Msg, En);
 
-    const toolbox = {
-        kind: 'categoryToolbox',
-        contents: [
-        {
-            kind: 'category',
-            name: 'Logic',
-            colour: '#5757FF',
-            contents: [
-            { kind: 'block', type: 'controls_if' },
-            { kind: 'block', type: 'logic_compare' },
-            { kind: 'block', type: 'logic_operation' },
-            { kind: 'block', type: 'logic_negate' },
-            { kind: 'block', type: 'logic_boolean' }
-            ]
-        },
-        {
-            kind: 'category',
-            name: 'Loops',
-            colour: '#74CC00',
-            contents: [
-            {
-                kind: 'block',
-                type: 'controls_repeat_ext',
-                inputs: { TIMES: { shadow: { type: 'math_number', fields: { NUM: 10 } } } }
-            },
-            { kind: 'block', type: 'controls_whileUntil' },
-            {
-                kind: 'block',
-                type: 'controls_for',
-                inputs: {
-                FROM: { shadow: { type: 'math_number', fields: { NUM: 1 } } },
-                TO: { shadow: { type: 'math_number', fields: { NUM: 10 } } },
-                BY: { shadow: { type: 'math_number', fields: { NUM: 1 } } }
-                }
-            }
-            ]
-        },
-        {
-            kind: 'category',
-            name: 'Math',
-            colour: '#BC3FDC',
-            contents: [
-            { kind: 'block', type: 'math_number', fields: { NUM: 123 } },
-            { kind: 'block', type: 'math_arithmetic' },
-            {
-                kind: 'block',
-                type: 'math_random_int',
-                inputs: {
-                FROM: { shadow: { type: 'math_number', fields: { NUM: 1 } } },
-                TO: { shadow: { type: 'math_number', fields: { NUM: 100 } } }
-                }
-            }
-            ]
-        },
-        {
-            kind: 'category',
-            name: 'Text',
-            colour: '#FF5757',
-            contents: [
-            { kind: 'block', type: 'text' },
-            { kind: 'block', type: 'text_print' }
-            ]
-        },
-        { kind: 'category', name: 'Variables', custom: 'VARIABLE', colour: '#FFBD59' },
-        {
-            kind: 'category',
-            name: 'Arduino',
-            colour: '#5757FF',
-            contents: [
-            { kind: 'block', type: 'pin_out' },
-            { kind: 'block', type: 'pin_set' },
-            { kind: 'block', type: 'wait_ms', fields: { DURATION: 1000 } }
-            ]
-        },
-        {
-            kind: 'category',
-            name: 'AutOBot',
-            colour: '#BC3FDC',
-            contents: [
-            { kind: 'block', type: 'autobot_begin', fields: { TYPE: 'mecanum', DEV: 0 } },
-            {
-                kind: 'block',
-                type: 'autobot_move_simple',
-                inputs: {
-                SPEED: { shadow: { type: 'math_number', fields: { NUM: 1.0 } } },
-                TIME: { shadow: { type: 'math_number', fields: { NUM: 1000 } } }
-                }
-            },
-            {
-                kind: 'block',
-                type: 'autobot_drive',
-                inputs: {
-                X: { shadow: { type: 'math_number', fields: { NUM: 0 } } },
-                Y: { shadow: { type: 'math_number', fields: { NUM: 0 } } },
-                W: { shadow: { type: 'math_number', fields: { NUM: 0 } } }
-                }
-            },
-            { kind: 'block', type: 'autobot_stop' },
-            { kind: 'block', type: 'autobot_teleop' }
-            ]
-        },
-        {
-            kind: 'category',
-            name: 'AutOBotAI',
-            colour: '#FF5757',
-            contents: [
-            { kind: 'block', type: 'autobot_ai_begin' },
-            { kind: 'block', type: 'autobot_ai_handle' },
-            { kind: 'sep', gap: 20 },
-            {
-                kind: 'block',
-                type: 'autobot_ai_human',
-                inputs: {
-                SPEED: { shadow: { type: 'math_number', fields: { NUM: 0 } } },
-                TURN: { shadow: { type: 'math_number', fields: { NUM: 0.5 } } }
-                }
-            },
-            {
-                kind: 'block',
-                type: 'autobot_ai_line',
-                inputs: { SPEED: { shadow: { type: 'math_number', fields: { NUM: 50 } } } }
-            }
-            ]
-        }
-        ]
-    };
-
     const workspace = Blockly.inject(blocklyDivRef.current, {
-        toolbox,
+        toolbox: BlocklyToolBoxAppearence,
         renderer: "zelos",
         grid: { spacing: 20, length: 3, colour: "#E5E7EB", snap: true },
         zoom: { controls: true, wheel: true, startScale: 1.0 },
@@ -196,7 +107,6 @@ export default function BlocklyPage({ params }: { params: Promise<{ id: string }
 
     workspaceRef.current = workspace;
 
-    // 4. Initial Blocks
     const on_start = workspace.newBlock("on_start");
     const on_loop = workspace.newBlock("on_loop");
     on_start.initSvg();
@@ -241,23 +151,36 @@ export default function BlocklyPage({ params }: { params: Promise<{ id: string }
         ro.disconnect();
         workspace.dispose();
     };
+
+    
     }, []);
 
     const runCode = async () => {
         if (!workspaceRef.current) return;
+        const arduinoCode = ArduinoGenerator.workspaceToCode(workspaceRef.current) || "// (no blocks yet)\n";
 
-        const ag = ArduinoGenerator.workspaceToCode(workspaceRef.current) || "// (no blocks yet)\n";
+        try {
+            await fetch("api/writefile", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ content: arduinoCode }),
+            });
+            console.log("from client", selectPort);
+            const res = await fetch("/api/upload", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ port: selectPort }),
+            });
 
-        await fetch("api/write_file", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ content: ag }),
-        });
-
-        await fetch("api/compile_upload", {
-        method: "GET",
-        headers: { "Content-Type": "application/json" },
-        });
+            if (res.ok) {
+                alert("Code uploaded successfully!");
+            } else {
+                alert("Failed to upload code.");
+            }
+        } catch (err) {
+            console.error("Upload failed", err);
+            alert("An error occurred during upload.");
+        }
     };
 
     const saveCode = () => {
@@ -331,30 +254,64 @@ export default function BlocklyPage({ params }: { params: Promise<{ id: string }
 
         <footer className="flex-[1] bg-[#365AFF] flex items-center justify-between px-6 text-white z-10 shadow-lg shrink-0">
         <div className="flex gap-3">
-            <button onClick={saveCode} className="flex items-center gap-2 bg-[#2149FF] px-6 py-2 rounded-lg font-bold shadow-sm transition-all active:scale-95">
-                <Download size={18} /> Upload
+            <button onClick={runCode} className="flex items-center gap-2 bg-[#2149FF] px-6 py-2 rounded-lg font-bold shadow-sm transition-all active:scale-95">
+            <Download size={18} /> Upload
             </button>
             <button onClick={clearWorkspace} className="flex items-center gap-2 bg-blue-500/20 border border-blue-400/30 px-4 py-2 rounded-lg shadow-sm transition-all active:scale-95">
-                <Trash2 size={16} /> Clear
+            <Trash2 size={16} /> Clear
             </button>
             <button onClick={saveCode} className="flex items-center gap-2 bg-[#2149FF] px-6 py-2 rounded-lg font-bold shadow-sm transition-all active:scale-95">
-                <Save size={18} /> Save
+            <Save size={18} /> Save
             </button>
             <button onClick={handleImportClick} className="flex items-center gap-2 bg-[#2149FF] px-6 py-2 rounded-lg font-bold shadow-sm transition-all active:scale-95">
-                <FolderOpen size={18} /> Import
+            <FolderOpen size={18} /> Import
             </button>
         </div>
-            <input 
-                type="file" 
-                ref={fileInputRef} 
-                onChange={loadFromFile} 
-                accept=".json" 
-                style={{ display: 'none' }} 
-            />
-        <div className="flex items-center gap-6 text-xs font-medium tracking-tight">
+
+        <input 
+            type="file" 
+            ref={fileInputRef} 
+            onChange={loadFromFile} 
+            accept=".json" 
+            style={{ display: 'none' }} 
+        />
+
+        {/* --- NEW DROPDOWN SECTION --- */}
+        <div className="flex items-center gap-4 ml-auto mr-6">
+            <div className="relative group">
+                <select 
+                    className="appearance-none bg-black/20 hover:bg-black/30 border border-white/10 px-4 py-1.5 pr-8 rounded text-xs font-medium cursor-pointer outline-none transition-colors"
+                    value={selectPort} // Bind the state to the select value
+                    onChange={(e) => {
+                        const newValue = e.target.value;
+                        setSelectPort(newValue);
+                        console.log("Selected port:", newValue);
+                    }}
+                >
+                    <option value="">
+                        {Ports.length > 0 ? "Select a Port" : "No Ports Found"}
+                    </option>
+
+                    {/* {Ports.map((p, index) => (
+                        <option 
+                            key={p.portAddress || index} 
+                            value={p.portAddress} 
+                            className="bg-[#365AFF]"
+                        >
+                            {p.portAddress}
+                        </option>
+                    ))} */}
+                </select>
+            <div className="absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none">
+                <ChevronDown size={14} className="opacity-70" />
+            </div>
+            </div>
+
+            <div className="flex items-center gap-6 text-xs font-medium tracking-tight">
             <div className="flex items-center gap-2 bg-black/20 px-3 py-1 rounded">
-            <FolderOpen size={14} />
-            <span>{name}</span>
+                <FolderOpen size={14} />
+                <span>{name}</span>
+            </div>
             </div>
         </div>
 

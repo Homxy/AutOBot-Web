@@ -21,7 +21,6 @@ export default function Home() {
     }
     else {
       fetchWorkspaces();
-      console.log(projects)
     }
 
   }, []);
@@ -30,7 +29,6 @@ export default function Home() {
     try {
       const res = await fetch('/api/workspace');
       const data = await res.json();
-      console.log(data);  
       setProjects(data);
     } 
     catch (error) {
@@ -97,6 +95,7 @@ export default function Home() {
               <Card 
                 key={project.id} 
                 name={project.name} 
+                updatedAt={new Date(project.updatedAt).toLocaleTimeString([], { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
                 onClick={() => router.push(`/${project.id}`)}
                 onDelete={() => setProjectToDelete(project)} 
               />

@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import { useSession, signOut } from "next-auth/react"
 import { useEffect, useRef, useState } from "react"
 import Button from '../../ui/button'
-import ProfileMenu from '../profile'
+import ProfileMenu from '../../ui/profile'
 
 const Links = [
   { href: "/", text: "Home" },
