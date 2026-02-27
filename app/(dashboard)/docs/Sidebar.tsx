@@ -16,7 +16,19 @@ const menuItemsEn = [
     ]
   },
   { title: "3. Hardware", href: "/docs/hardware" },
-  { title: "4. Software", href: "/docs/software" },
+  {
+    title: "4. Software",
+    href: "/docs/software",
+    children: [
+      { title: "4.1 Logic", href: "/docs/software/logic" },
+      { title: "4.2 Loops", href: "/docs/software/loops" },
+      { title: "4.3 Math", href: "/docs/software/math" },
+      { title: "4.4 Text", href: "/docs/software/text" },
+      { title: "4.5 Pins", href: "/docs/software/pins" },
+      { title: "4.6 Control", href: "/docs/software/control" },
+      { title: "4.7 AutOBot", href: "/docs/software/autobot" },
+    ]
+  },
   {
     title: "5. AI",
     href: "/docs/ai/usage",
@@ -40,7 +52,19 @@ const menuItemsTh = [
     ]
   },
   { title: "3. ฮาร์ดแวร์", href: "/docs/hardware_th" },
-  { title: "4. โปรแกรม", href: "/docs/software" },
+  {
+    title: "4. โปรแกรม",
+    href: "/docs/software",
+    children: [
+      { title: "4.1 ตรรกะ", href: "/docs/software/logic_th" },
+      { title: "4.2 ลูป", href: "/docs/software/loops_th" },
+      { title: "4.3 คณิตศาสตร์", href: "/docs/software/math_th" },
+      { title: "4.4 ข้อความ", href: "/docs/software/text_th" },
+      { title: "4.5 พิน", href: "/docs/software/pins_th" },
+      { title: "4.6 การควบคุม", href: "/docs/software/control_th" },
+      { title: "4.7 ไลบรารี AutOBot", href: "/docs/software/autobot_th" },
+    ]
+  },
   {
     title: "5. AI",
     href: "/docs/ai/usage_th",
@@ -78,7 +102,7 @@ export default function Sidebar() {
         </div>
       </div>
 
-      <nav style={{ flex: 1 }}>
+      <nav style={{ flex: 1, overflowY: 'auto', paddingRight: '10px' }}>
         {menuItems.map((item) => {
           const isParentActive = pathname === item.href || (item.children?.some(child => pathname === child.href));
 

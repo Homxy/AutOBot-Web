@@ -1,0 +1,62 @@
+# ไลบรารี AutOBot
+
+## ตั้งค่าการขับเคลื่อน AutOBot (`autobot_begin`)
+
+ตั้งค่าประเภทล้อขับเคลื่อนให้ AutOBot (Differential, Omni 3-Wheel, Mecanum) และค่าความคลาดเคลื่อน
+
+### Arduino Generates
+
+```cpp
+robot.begin("drive_type", deviation);
+```
+
+---
+
+## การเคลื่อนที่พื้นฐาน (`autobot_move_simple`)
+
+สั่ง AutOBot เคลื่อนที่ตามทิศทาง (เดินหน้า, ถอยหลัง, สไลด์ซ้าย, สไลด์ขวา, หมุน)
+
+### Arduino Generates
+
+```cpp
+robot.goForward(speed, time);
+```
+
+---
+
+## การขับเคลื่อนแบบเวกเตอร์ (`autobot_drive`)
+
+ขับเคลื่อน AutOBot โดยใช้เวกเตอร์ X, Y และ W
+
+### Arduino Generates
+
+```cpp
+robot.drive(X, Y, W);
+```
+
+---
+
+## หยุด AutOBot (`autobot_stop`)
+
+หยุดมอเตอร์ทั้งหมดทันที
+
+### Arduino Generates
+
+```cpp
+robot.stop();
+```
+
+---
+
+## ระบบ Teleop ของ AutOBot (`autobot_teleop`)
+
+เริ่มใช้งานโหมดควบคุมด้วยสวิตช์มือถือ/บลูทูธ (Teleop)
+
+### Arduino Generates
+
+```cpp
+robot.telop();
+```
+
+---
+

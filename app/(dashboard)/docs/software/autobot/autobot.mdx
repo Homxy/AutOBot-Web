@@ -1,0 +1,62 @@
+# AutOBot Library
+
+## AutOBot Setup Drive (`autobot_begin`)
+
+Initializes the AutOBot with a specific drive type (Differential, Omni 3-Wheel, Mecanum) and deviation.
+
+### Arduino Generates
+
+```cpp
+robot.begin("drive_type", deviation);
+```
+
+---
+
+## AutOBot Simple Movement (`autobot_move_simple`)
+
+Moves the AutOBot in standard directions (forward, backward, slide left, slide right, rotate).
+
+### Arduino Generates
+
+```cpp
+robot.goForward(speed, time);
+```
+
+---
+
+## AutOBot Drive Vector (`autobot_drive`)
+
+Moves the AutOBot using X, Y, and W vectors.
+
+### Arduino Generates
+
+```cpp
+robot.drive(X, Y, W);
+```
+
+---
+
+## AutOBot Stop (`autobot_stop`)
+
+Stops all AutOBot motors immediately.
+
+### Arduino Generates
+
+```cpp
+robot.stop();
+```
+
+---
+
+## AutOBot Teleop (`autobot_teleop`)
+
+Starts the AutOBot Teleop mode (e.g., via Bluetooth).
+
+### Arduino Generates
+
+```cpp
+robot.telop();
+```
+
+---
+
