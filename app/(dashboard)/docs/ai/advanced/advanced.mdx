@@ -33,7 +33,17 @@ ssh autobot@autobot-pi
 
 When prompted, enter the password for the `autobot` user (press the space bar once).
 
-### Step 4 — Locate the Client Script
+### Step 4 — Grant Serial Port Access
+
+To allow the AI client to communicate with the hardware via serial port, add the user to the `dialout` group:
+
+```bash
+sudo usermod -a -G dialout $USER
+```
+
+> **Note:** You must log out and log back in (or reboot the Pi) for this permission to take effect.
+
+### Step 5 — Locate the Client Script
 
 The main Python script is located at:
 
