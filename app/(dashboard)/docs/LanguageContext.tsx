@@ -25,6 +25,20 @@ const routeMap: Record<string, string> = {
   '/docs/feature/spec_th': '/docs/feature/spec',
   '/docs/feature/component': '/docs/feature/component_th',
   '/docs/feature/component_th': '/docs/feature/component',
+  '/docs/software/logic': '/docs/software/logic_th',
+  '/docs/software/logic_th': '/docs/software/logic',
+  '/docs/software/loops': '/docs/software/loops_th',
+  '/docs/software/loops_th': '/docs/software/loops',
+  '/docs/software/math': '/docs/software/math_th',
+  '/docs/software/math_th': '/docs/software/math',
+  '/docs/software/text': '/docs/software/text_th',
+  '/docs/software/text_th': '/docs/software/text',
+  '/docs/software/pins': '/docs/software/pins_th',
+  '/docs/software/pins_th': '/docs/software/pins',
+  '/docs/software/control': '/docs/software/control_th',
+  '/docs/software/control_th': '/docs/software/control',
+  '/docs/software/autobot': '/docs/software/autobot_th',
+  '/docs/software/autobot_th': '/docs/software/autobot',
 };
 
 export const LanguageProvider = ({ children }: { children: React.ReactNode }) => {
@@ -43,7 +57,12 @@ export const LanguageProvider = ({ children }: { children: React.ReactNode }) =>
   useEffect(() => {
     if (pathname.includes('_th')) {
       setLanguage('th');
-    } else if (pathname.startsWith('/docs/ai/') || pathname === '/docs/hardware' || pathname.startsWith('/docs/feature/')) {
+    } else if (
+      pathname.startsWith('/docs/ai/') ||
+      pathname === '/docs/hardware' ||
+      pathname.startsWith('/docs/feature/') ||
+      pathname.startsWith('/docs/software/')
+    ) {
       setLanguage('en');
     }
   }, [pathname]);
