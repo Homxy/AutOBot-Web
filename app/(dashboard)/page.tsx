@@ -96,7 +96,7 @@ export default function Home() {
                 key={project.id} 
                 name={project.name} 
                 updatedAt={new Date(project.updatedAt).toLocaleTimeString([], { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
-                onClick={() => router.push(`/${project.id}`)}
+                onClick={() => router.push(`/${project.name}`)}
                 onDelete={() => setProjectToDelete(project)} 
               />
             ))}

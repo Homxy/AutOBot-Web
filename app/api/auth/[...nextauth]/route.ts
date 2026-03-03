@@ -2,8 +2,6 @@ import { prisma } from '@/lib/prisma'
 import { NextAuthOptions } from 'next-auth'
 import NextAuth from 'next-auth/next'
 import GoogleProvider from 'next-auth/providers/google'
-import FacebookProvider from 'next-auth/providers/facebook'
-import { PrismaAdapter } from '@auth/prisma-adapter'
 import { session } from '@/lib/session'
 
 

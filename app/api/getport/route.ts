@@ -1,4 +1,4 @@
-import { getPort } from "@/node/getPort"
+import { getPort } from "@/node/get-port"
 import { NextResponse } from 'next/server';
 
 export async function GET(req: Request) {

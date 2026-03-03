@@ -27,8 +27,8 @@ model User {
 }
 
 model Workspace {
-  id            Int      @unique @id @default(autoincrement())
-  name          String
+  id            Int      @id @default(autoincrement())
+  name          String   @unique
   data          Json   
   author        User     @relation(fields: [authorId], references: [id])
   authorId      Int

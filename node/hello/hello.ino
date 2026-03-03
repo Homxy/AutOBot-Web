@@ -1,16 +1,13 @@
 #include <AutOBot.h>
-#include <AutOBotPi.h>
 
 AutOBot robot;
 
-AutOBotAI ai;
 void setup() {
-    robot.begin("DRIVE_DIFFERENTIAL", 0);
+    robot.begin(DRIVE_OMNI_3W, -10);
   
 }
 void loop() {
-    robot.goForward(0.5, 1000);
+    robot.goForward(80, 4000);
     delay(1000);
-    robot.goBackward(0.5, 1000);
   
 }

@@ -4,15 +4,8 @@ import { Instance} from './cc/arduino/cli/commands/v1/common_pb';
 import {InitRequest,
         InitResponse,
         CreateRequest,
-        UpdateIndexRequest,
         } from './cc/arduino/cli/commands/v1/commands_pb';
-import { PlatformInstallRequest,
-          PlatformSearchRequest,
-          PlatformSearchResponse,
- } from './cc/arduino/cli/commands/v1/core_pb';
-import { BoardDetailsRequest,
-         BoardDetailsResponse,
-         BoardListRequest,
+import { BoardListRequest,
          BoardListResponse
         } from './cc/arduino/cli/commands/v1/board_pb';
 import { CompileRequest,

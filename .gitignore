@@ -46,7 +46,3 @@ next-env.d.ts
 node/arduino-rpc-client/packages/
 node/arduino-rpc-client/staging/
 node/arduino-rpc-client/sketchbook/
-
-# Optional: ignore everything in node folder except source files
-node/arduino-rpc-client/packages/**
-node/arduino-rpc-client/tools/**

@@ -1,4 +1,5 @@
 import Navbar from "@/components/layout/navbar"
+import { ToastProvider } from "@/components/ui/toast/ToastContext"
 
 export default function DocsLayout({
   children,
@@ -9,7 +10,9 @@ export default function DocsLayout({
     <div className="h-screen">
       <Navbar />
       <main  className="flex-1">
-        {children}
+        <ToastProvider>
+          {children}
+        </ToastProvider>
       </main>
     </div>
   )
