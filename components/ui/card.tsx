@@ -5,11 +5,13 @@ import { Plus, X, Folder, Trash2 } from 'lucide-react';
 
 const Card = ({ 
   name, 
+  updatedAt,
   isTrigger, 
   onClick, 
   onDelete 
 }: { 
   name?: string; 
+  updatedAt?: string;
   isTrigger?: boolean; 
   onClick: () => void;
   onDelete?: () => void;
@@ -52,7 +54,7 @@ const Card = ({
       
       <div className="w-full">
         <h3 className="text-lg font-bold text-slate-800 truncate">{name}</h3>
-        <p className="text-sm text-slate-500">Project Workspace</p>
+        <p className="text-sm text-slate-500">updated at {updatedAt}</p>
       </div>
     </div>
   );

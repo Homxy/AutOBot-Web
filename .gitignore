@@ -41,3 +41,8 @@ yarn-error.log*
 next-env.d.ts
 
 /lib/generated/prisma
+
+# Ignore Arduino RPC client toolchains
+node/arduino-rpc-client/packages/
+node/arduino-rpc-client/staging/
+node/arduino-rpc-client/sketchbook/
