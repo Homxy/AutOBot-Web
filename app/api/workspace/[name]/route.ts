@@ -8,8 +8,8 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ name: 
 
         await prisma.workspace.update({
             where: { name: name },
-            data: { 
-                data: blocklyData 
+            data: {
+                data: blocklyData
             },
         });
 
@@ -39,18 +39,18 @@ export async function GET(req: Request, { params }: { params: Promise<{ name: st
     }
 }
 
-export async function DELETE(req: Request, { params }: { params: Promise<{ id: string }> }) {
+export async function DELETE(req: Request, { params }: { params: Promise<{ name: string }> }) {
     try {
-        const { id} = await params;
+        const { name } = await params;
 
         const deletedWorkspace = await prisma.workspace.delete({
-            where: { 
-                id: Number(id) 
+            where: {
+                name: name
             }
         });
-        
+
         return NextResponse.json({ message: "Deleted successfully" }, { status: 200 });
-    } 
+    }
     catch (error) {
         console.error("DELETE Workspace Error:", error);
         return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });

@@ -76,12 +76,12 @@ export default function Home() {
     if (!projectToDelete) return;
 
     try {
-      const res = await fetch(`/api/workspace/${projectToDelete.id}`, {
+      const res = await fetch(`/api/workspace/${projectToDelete.name}`, {
         method: 'DELETE',
       });
 
       if (res.ok) {
-        setProjects(projects.filter(p => p.id !== projectToDelete.id));
+        setProjects(projects.filter(p => p.name !== projectToDelete.name));
         setProjectToDelete(null);
         setIsModalOpen(false);
       }
