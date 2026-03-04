@@ -79,28 +79,23 @@ Connect the ESP32 to the Raspberry Pi GPIO header using the following pinout:
 Include the following in your `.ino` sketch to establish communication with the Raspberry Pi:
 
 ```cpp
-#include <ArduinoRobot.h>
+#include <AutOBot.h>
+#include <AutOBotAI.h>
 
-// UART pins connected to the Raspberry Pi
-#define PI_RX_PIN 16
-#define PI_TX_PIN 17
-
-// Create library objects
-ArduinoClient robot;
-PiCommunication piComm(PiSerial, robot);
+AutOBot myBot;
+AutOBotAI myAI;
 
 void setup() {
-  // Initialize serial communication with the Raspberry Pi
-  PiSerial.begin(115200, SERIAL_8N1, PI_RX_PIN, PI_TX_PIN);
+  Serial.begin(115200);
+  Serial2.begin(115200, SERIAL_8N1, myAI.rx, myAI.tx); // RX, TX for AI comms
+  
+  myBot.begin(DRIVE_OMNI_3W, 0);
+  myAI.begin(Serial, myBot);
 
-  // Initialize the communication handler
-  piComm.init();
 }
 
 void loop() {
-  // Process incoming commands from the Raspberry Pi
-  piComm.handle();
+  myAI.handle();
 }
-```
 
 > For full examples and advanced drive configurations, see the [Examples](/docs/ai/demo) page.

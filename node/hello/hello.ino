@@ -3,11 +3,11 @@
 AutOBot robot;
 
 void setup() {
-    robot.begin(DRIVE_OMNI_3W, -10);
+    robot.begin(DRIVE_DIFFERENTIAL, 0);
   
 }
 void loop() {
-    robot.goForward(80, 4000);
+    robot.rotateCCW(80, 4000);
     delay(1000);
   
 }

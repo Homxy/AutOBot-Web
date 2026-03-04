@@ -6,14 +6,15 @@ Complete reference for all public functions in the Autobot Library.
 
 ## Arduino API
 
-### robot.init()
+### AutOBot.begin()
 
 Initializes the robot with a specific drive type and motor configuration.
 
 ```cpp
-#include "ArduinoRobot.h"
+#include "AutOBot.h"
 
-robot.init(type, motorPins, motorCount, deviation);
+AutOBot myBot;
+myBot.begin(type, deviation);
 ```
 
 #### Parameters
@@ -21,17 +22,15 @@ robot.init(type, motorPins, motorCount, deviation);
 | Parameter | Type | Description |
 | :--- | :--- | :--- |
 | `type` | `DriveType` | The drive configuration. One of: `DRIVE_DIFFERENTIAL`, `DRIVE_OMNI_3W`, `DRIVE_MECANUM` |
-| `motorPins` | `int[]` | Array of GPIO pin numbers for each motor (see table below) |
-| `motorCount` | `int` | Total number of motors (e.g., `2`, `3`, `4`) |
 | `deviation` | `int` | Correction for straight-line drift. Range: `-100` to `100` |
 
 #### Motor Pin Arrays by Drive Type
 
 | Drive Type | Pin Array Format |
 | :--- | :--- |
-| Differential (2W) | `{FL_IN1, FL_IN2, FR_IN1, FR_IN2}` |
-| Differential (4W) / Mecanum | `{FL_IN1, FL_IN2, FR_IN1, FR_IN2, RL_IN1, RL_IN2, RR_IN1, RR_IN2}` |
-| Omni (3W) | `{M1_IN1, M1_IN2, M2_IN1, M2_IN2, M3_IN1, M3_IN2}` |
+| Differential (2W) | `motor1(a = 18, b = 19), motor2(a = 22, b = 23)` |
+| Differential (4W) / Mecanum | `motor1(a = 18, b = 19), motor2(a = 22, b = 23), motor3(a = 25, b = 26), motor4(a = 27, b = 14)` |
+| Omni (3W) | `motor1(a = 18, b = 19), motor2(a = 22, b = 23), motor3(a = 25, b = 26)` |
 
 #### Deviation Guide
 
@@ -67,8 +66,11 @@ Initialize the UART connection between the ESP32 and Raspberry Pi.
 
 ```cpp
 // In setup()
-PiSerial.begin(baudRate, SERIAL_8N1, PI_RX_PIN, PI_TX_PIN);
-piComm.init();
+AutOBot myBot;
+AutOBotAI myAI;
+myBot.begin(type, deviation);
+myAI.begin(Serial, myBot);
+Serial2.begin(baudRate, SERIAL_8N1, myAI.rx, myAI.tx);
 ```
 
 | Parameter | Type | Default | Description |
@@ -79,17 +81,17 @@ piComm.init();
 
 ```cpp
 // In loop() — required to process incoming drive commands
-piComm.handle();
+AutOBotAI.handle();
 ```
 
 ---
 
-### piComm.requestHuman()
+### AutOBotAI.requestHuman()
 
 Requests the Raspberry Pi to start **Human Tracking** mode.
 
 ```cpp
-piComm.requestHuman(baseSpeed, turnGain, boxSize, deadzone);
+AutOBotAI.requestHuman(baseSpeed, turnGain, boxSize, deadzone);
 ```
 
 | Parameter | Type | Default | Description |
@@ -101,12 +103,12 @@ piComm.requestHuman(baseSpeed, turnGain, boxSize, deadzone);
 
 ---
 
-### piComm.requestLine()
+### AutOBotAI.requestLine()
 
 Requests the Raspberry Pi to start **Line Tracking** mode.
 
 ```cpp
-piComm.requestLine(baseSpeed, turnGain, thresh, color, defS, defD, defA);
+AutOBotAI.requestLine(baseSpeed, turnGain, thresh, color, defS, defD, defA);
 ```
 
 | Parameter | Type | Default | Description |
@@ -121,22 +123,12 @@ piComm.requestLine(baseSpeed, turnGain, thresh, color, defS, defD, defA);
 
 ---
 
-### piComm.setDriveType()
-
-Overrides the active drive type at runtime (e.g., switching a Mecanum robot to lateral movement).
-
-```cpp
-piComm.setDriveType(type);  // "diff", "omni", or "mac"
-```
-
----
-
-### piComm.requestStop()
+### AutOBotAI.requestStop()
 
 Stops all active AI processing on the Raspberry Pi.
 
 ```cpp
-piComm.requestStop();
+AutOBotAI.requestStop();
 ```
 
 ---

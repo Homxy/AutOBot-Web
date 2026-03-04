@@ -6,14 +6,15 @@
 
 ## Arduino API
 
-### robot.init()
+### AutOBot.begin()
 
 เริ่มต้นหุ่นยนต์ด้วยประเภทการขับเคลื่อนและการตั้งค่ามอเตอร์ที่ระบุ
 
 ```cpp
-#include "ArduinoRobot.h"
+#include "AutOBot.h"
 
-robot.init(type, motorPins, motorCount, deviation);
+AutOBot myBot;
+myBot.begin(type, deviation);
 ```
 
 #### พารามิเตอร์
@@ -21,17 +22,15 @@ robot.init(type, motorPins, motorCount, deviation);
 | พารามิเตอร์ | ชนิด | คำอธิบาย |
 | :--- | :--- | :--- |
 | `type` | `DriveType` | ประเภทการขับเคลื่อน: `DRIVE_DIFFERENTIAL`, `DRIVE_OMNI_3W`, `DRIVE_MECANUM` |
-| `motorPins` | `int[]` | อาร์เรย์หมายเลขขา GPIO สำหรับแต่ละมอเตอร์ (ดูตารางด้านล่าง) |
-| `motorCount` | `int` | จำนวนมอเตอร์ทั้งหมด (เช่น `2`, `3`, `4`) |
 | `deviation` | `int` | ค่าแก้ไขการเบี่ยงเบนเส้นตรง ช่วง: `-100` ถึง `100` |
 
 #### อาร์เรย์ขามอเตอร์ตามประเภทการขับเคลื่อน
 
 | ประเภทการขับเคลื่อน | รูปแบบอาร์เรย์ขา |
 | :--- | :--- |
-| Differential (2W) | `{FL_IN1, FL_IN2, FR_IN1, FR_IN2}` |
-| Differential (4W) / Mecanum | `{FL_IN1, FL_IN2, FR_IN1, FR_IN2, RL_IN1, RL_IN2, RR_IN1, RR_IN2}` |
-| Omni (3W) | `{M1_IN1, M1_IN2, M2_IN1, M2_IN2, M3_IN1, M3_IN2}` |
+| Differential (2W) | `motor1(a = 18, b = 19), motor2(a = 22, b = 23)` |
+| Differential (4W) / Mecanum | `motor1(a = 18, b = 19), motor2(a = 22, b = 23), motor3(a = 25, b = 26), motor4(a = 27, b = 14)` |
+| Omni (3W) | `motor1(a = 18, b = 19), motor2(a = 22, b = 23), motor3(a = 25, b = 26)` |
 
 #### คู่มือค่าเบี่ยงเบน
 
@@ -43,12 +42,12 @@ robot.init(type, motorPins, motorCount, deviation);
 
 ---
 
-### robot.drive()
+### AutOBot.drive()
 
 สั่งให้หุ่นยนต์เคลื่อนที่ในทิศทางที่กำหนดด้วยความเร็วที่กำหนด พร้อมการหมุนเพิ่มเติม
 
 ```cpp
-robot.drive(speed, direction, angular);
+myBot.drive(speed, direction, angular);
 ```
 
 #### พารามิเตอร์
@@ -67,8 +66,11 @@ robot.drive(speed, direction, angular);
 
 ```cpp
 // ใน setup()
-PiSerial.begin(baudRate, SERIAL_8N1, PI_RX_PIN, PI_TX_PIN);
-piComm.init();
+AutOBot myBot;
+AutOBotAI myAI;
+myBot.begin(type, deviation);
+myAI.begin(Serial, myBot);
+Serial2.begin(baudRate, SERIAL_8N1, myAI.rx, myAI.tx);
 ```
 
 | พารามิเตอร์ | ชนิด | ค่าเริ่มต้น | คำอธิบาย |
@@ -79,17 +81,17 @@ piComm.init();
 
 ```cpp
 // ใน loop() — จำเป็นสำหรับประมวลผลคำสั่งขับเคลื่อนที่เข้ามา
-piComm.handle();
+myAI.handle();
 ```
 
 ---
 
-### piComm.requestHuman()
+### AutOBotAI.requestHuman()
 
 ร้องขอให้ Raspberry Pi เริ่มโหมด **Human Tracking**
 
 ```cpp
-piComm.requestHuman(baseSpeed, turnGain, boxSize, deadzone);
+myAI.requestHuman(baseSpeed, turnGain, boxSize, deadzone);
 ```
 
 | พารามิเตอร์ | ชนิด | ค่าเริ่มต้น | คำอธิบาย |
@@ -101,12 +103,12 @@ piComm.requestHuman(baseSpeed, turnGain, boxSize, deadzone);
 
 ---
 
-### piComm.requestLine()
+### AutOBotAI.requestLine()
 
 ร้องขอให้ Raspberry Pi เริ่มโหมด **Line Tracking**
 
 ```cpp
-piComm.requestLine(baseSpeed, turnGain, thresh, color, defS, defD, defA);
+myAI.requestLine(baseSpeed, turnGain, thresh, color, defS, defD, defA);
 ```
 
 | พารามิเตอร์ | ชนิด | ค่าเริ่มต้น | คำอธิบาย |
@@ -121,22 +123,12 @@ piComm.requestLine(baseSpeed, turnGain, thresh, color, defS, defD, defA);
 
 ---
 
-### piComm.setDriveType()
-
-เปลี่ยนประเภทการขับเคลื่อนขณะทำงาน (เช่น สลับหุ่นยนต์ Mecanum เป็นการเคลื่อนที่ด้านข้าง)
-
-```cpp
-piComm.setDriveType(type);  // "diff", "omni", or "mac"
-```
-
----
-
-### piComm.requestStop()
+### AutOBotAI.requestStop()
 
 หยุดการประมวลผล AI ทั้งหมดบน Raspberry Pi
 
 ```cpp
-piComm.requestStop();
+myAI.requestStop();
 ```
 
 ---

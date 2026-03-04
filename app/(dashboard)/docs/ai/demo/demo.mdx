@@ -4,12 +4,13 @@ This page provides complete, ready-to-use sketches for common Autobot configurat
 
 ## Installation
 
-1. Download [`ArduinoRobot.h`](https://github.com/CannabiZz9/Autobot_Library/blob/main/ArduinoRobot.h).
+1. Download [`AutOBot Library`](https://github.com/Homxy/AutOBot).
 2. Place the file in your Arduino project folder.
 3. Include it at the top of your sketch:
 
 ```cpp
-#include "ArduinoRobot.h"
+#include "AutOBot.h" // if you want to use the library without AI
+#include "AutOBotAI.h" // if you want to use the library with AI
 ```
 
 ---
@@ -18,41 +19,25 @@ This page provides complete, ready-to-use sketches for common Autobot configurat
 
 ### Differential With Raspberry Pi
 
-> [Source Code](https://github.com/CannabiZz9/Autobot_Library/tree/main/Arduino-client-diff)
 
 ```cpp
-#include "ArduinoRobot.h"
+#include <AutOBot.h>
+#include <AutOBotAI.h>
 
-// ── Pin Configuration ──────────────────────────
-int motorPins[] = {18, 19, 22, 23};
-
-// ── Serial Configuration (Raspberry Pi) ────────
-HardwareSerial PiSerial(2);
-
-#define PI_RX_PIN 16
-#define PI_TX_PIN 17
-
-// ── Objects ────────────────────────────────────
-ArduinoClient robot;
-PiCommunication piComm(PiSerial, robot);
+AutOBot myBot;
+AutOBotAI myAI;
 
 void setup() {
-  // Start USB serial for debugging
   Serial.begin(115200);
-  Serial.println("ESP32 Ready.");
+  Serial2.begin(115200, SERIAL_8N1, myAI.rx, myAI.tx); // RX, TX for AI comms
+  
+  myBot.begin(DRIVE_DIFFERENTIAL, 0);
+  myAI.begin(Serial, myBot);
 
-  // Start serial communication with the Pi
-  PiSerial.begin(115200, SERIAL_8N1, PI_RX_PIN, PI_TX_PIN);
-
-  // Initialize the robot (Differential, 2 motors, no deviation)
-  robot.init(DRIVE_DIFFERENTIAL, motorPins, 2, 0);
-
-  // Initialize communication handler
-  piComm.init();
 }
 
 void loop() {
-  piComm.handle();
+  myAI.handle();
 }
 ```
 
@@ -61,22 +46,16 @@ void loop() {
 A minimal sketch that drives the robot forward without any AI features.
 
 ```cpp
-#include "ArduinoRobot.h"
+#include <AutOBot.h>
 
-// ── Pin Configuration ──────────────────────────
-int motorPins[] = {18, 19, 22, 23};
+AutOBot myBot;
 
-// ── Objects ────────────────────────────────────
-ArduinoClient robot;
-
-void setup() {
-  // Initialize the robot (Differential, 2 motors, no deviation)
-  robot.init(DRIVE_DIFFERENTIAL, motorPins, 2, 0);
+void setup() {  
+  myBot.begin(DRIVE_DIFFERENTIAL, 0);
 }
 
 void loop() {
-  // Drive forward at full speed
-  robot.drive(100, 0, 0);
+  myBot.drive(0, 100, 0);
 }
 ```
 
@@ -86,51 +65,30 @@ void loop() {
 
 ### Mecanum With Raspberry Pi
 
-> [Source Code](https://github.com/CannabiZz9/Autobot_Library/tree/main/Arduino-client-mac)
 
 ```cpp
-#include "ArduinoRobot.h"
+#include <AutOBot.h>
+#include <AutOBotAI.h>
 
-// ── Pin Configuration (Mecanum) ────────────────
-const uint8_t FL_IN1 = 12; const uint8_t FL_IN2 = 13;  // Front Left
-const uint8_t FR_IN1 = 23; const uint8_t FR_IN2 = 22;  // Front Right
-const uint8_t RL_IN1 = 32; const uint8_t RL_IN2 = 33;  // Rear Left
-const uint8_t RR_IN1 = 21; const uint8_t RR_IN2 = 19;  // Rear Right
-
-// Pin Array: [FL1, FL2, FR1, FR2, RL1, RL2, RR1, RR2]
-int motorPins[] = {FL_IN1, FL_IN2, FR_IN1, FR_IN2, RL_IN1, RL_IN2, RR_IN1, RR_IN2};
-
-// ── Serial Configuration (Raspberry Pi) ────────
-HardwareSerial PiSerial(2);
-
-#define PI_RX_PIN 16
-#define PI_TX_PIN 17
-
-// ── Objects ────────────────────────────────────
-ArduinoClient robot;
-PiCommunication piComm(PiSerial, robot);
+AutOBot myBot;
+AutOBotAI myAI;
 
 void setup() {
   Serial.begin(115200);
-  Serial.println("ESP32 Ready.");
+  Serial2.begin(115200, SERIAL_8N1, myAI.rx, myAI.tx); // RX, TX for AI comms
+  
+  myBot.begin(DRIVE_MECANUM, 0);
+  myAI.begin(Serial, myBot);
+  myAI.requestHuman(50, 0.5, 30000, 5000);
 
-  PiSerial.begin(115200, SERIAL_8N1, PI_RX_PIN, PI_TX_PIN);
-  PiSerial.setTimeout(5);  // Reduce timeout to minimize lag
-
-  robot.init(DRIVE_MECANUM, motorPins, 4, 0);
-
-  piComm.init();
-  piComm.requestHuman();  // Start Human Tracking immediately
 }
 
 void loop() {
-  piComm.handle();
+  myAI.handle();
 }
 ```
 
 ### Timed AI Sequence
-
-> [Source Code](https://github.com/CannabiZz9/Autobot_Library/blob/main/Demo-Timing-AI/Arduino-client-mac.ino)
 
 This example demonstrates how to chain multiple AI modes using timers:
 
@@ -139,64 +97,58 @@ This example demonstrates how to chain multiple AI modes using timers:
 3. **Phase 3** — Stop.
 
 ```cpp
-#include "ArduinoRobot.h"
+#include <AutOBot.h>
+#include <AutOBotAI.h>
 
-// ── Pin Configuration (Mecanum) ────────────────
-const uint8_t FL_IN1 = 12; const uint8_t FL_IN2 = 13;
-const uint8_t FR_IN1 = 23; const uint8_t FR_IN2 = 22;
-const uint8_t RL_IN1 = 32; const uint8_t RL_IN2 = 33;
-const uint8_t RR_IN1 = 21; const uint8_t RR_IN2 = 19;
 
-int motorPins[] = {FL_IN1, FL_IN2, FR_IN1, FR_IN2, RL_IN1, RL_IN2, RR_IN1, RR_IN2};
+AutOBot myBot;
+AutOBotAI myAI;
 
-// ── Serial Configuration (Raspberry Pi) ────────
-HardwareSerial PiSerial(2);
-
-#define PI_RX_PIN 16
-#define PI_TX_PIN 17
-
-// ── Objects ────────────────────────────────────
-ArduinoClient robot;
-PiCommunication piComm(PiSerial, robot);
-
-// ── Timing State ───────────────────────────────
 unsigned long startTime;
 bool phaseLineStarted = false;
 bool phaseStopStarted = false;
 
 void setup() {
+
   Serial.begin(115200);
-  Serial.println("ESP32 Ready. Starting automated sequence...");
+  Serial.println("ESP32 Ready (AutOBot Mode)");
 
-  PiSerial.begin(115200, SERIAL_8N1, PI_RX_PIN, PI_TX_PIN);
-  PiSerial.setTimeout(5);
+  Serial2.begin(115200, SERIAL_8N1, myAI.rx, myAI.tx);
 
-  robot.init(DRIVE_MECANUM, motorPins, 4, 0);
-  piComm.init();
+  myBot.begin(DRIVE_MECANUM, 0);
 
-  // Phase 1: Start Human Tracking
+  // Bind AI module with Serial2 and robot
+  myAI.begin(Serial2, myBot);
+
+  // ── Phase 1: Human Tracking (10s) ────────────
   Serial.println("PHASE 1: Human Tracking (10s)");
-  piComm.requestHuman(30, 0.6, 30000, 5000);
+  myAI.requestHuman(30, 0.6, 30000, 5000);
 
   startTime = millis();
 }
 
 void loop() {
-  piComm.handle();
+
+  // Always process incoming AI data
+  myAI.handle();
 
   unsigned long elapsed = millis() - startTime;
 
-  // After 10s → switch to Line Tracking
+  // ── After 10s → Line Tracking ───────────────
   if (!phaseLineStarted && elapsed > 10000) {
     Serial.println("PHASE 2: Line Tracking (15s)");
-    piComm.requestLine(30, 0.8, 100, "black");
+
+    myAI.requestLine(30, 0.8, 100, "black", 0, 0, 0);
+
     phaseLineStarted = true;
   }
 
-  // After 25s (10 + 15) → stop
+  // ── After 25s → Stop ────────────────────────
   if (!phaseStopStarted && elapsed > 25000) {
     Serial.println("PHASE 3: Sequence complete. Stopping.");
-    piComm.requestStop();
+
+    myAI.requestStop();
+
     phaseStopStarted = true;
   }
 }
@@ -207,26 +159,16 @@ void loop() {
 A minimal Mecanum sketch that drives the robot forward without AI.
 
 ```cpp
-#include "ArduinoRobot.h"
+#include <AutOBot.h>
 
-// ── Pin Configuration (Mecanum) ────────────────
-const uint8_t FL_IN1 = 12; const uint8_t FL_IN2 = 13;
-const uint8_t FR_IN1 = 23; const uint8_t FR_IN2 = 22;
-const uint8_t RL_IN1 = 32; const uint8_t RL_IN2 = 33;
-const uint8_t RR_IN1 = 21; const uint8_t RR_IN2 = 19;
-
-int motorPins[] = {FL_IN1, FL_IN2, FR_IN1, FR_IN2, RL_IN1, RL_IN2, RR_IN1, RR_IN2};
-
-// ── Objects ────────────────────────────────────
-ArduinoClient robot;
+AutOBot myBot;
 
 void setup() {
-  robot.init(DRIVE_MECANUM, motorPins, 4, 0);
+  myBot.begin(DRIVE_MECANUM, 0);
 }
 
 void loop() {
-  // Drive forward at full speed
-  robot.drive(100, 0, 0);
+  myBot.drive(0, 100, 0);
 }
 ```
 
@@ -239,7 +181,7 @@ You can call these functions anywhere in your `loop()` — inside `if`, `else`, 
 ### Line Tracking
 
 ```cpp
-piComm.requestLine(30, 0.8, 100, "black");
+myAI.requestLine(30, 0.8, 100, "black");
 ```
 
 The robot will begin following a line. See the [API Reference](/docs/ai/reference) for full parameter details.
@@ -247,7 +189,7 @@ The robot will begin following a line. See the [API Reference](/docs/ai/referenc
 ### Human Tracking
 
 ```cpp
-piComm.requestHuman(30, 0.6, 30000, 5000);
+myAI.requestHuman(30, 0.6, 30000, 5000);
 ```
 
 The robot will begin following a detected human. See the [API Reference](/docs/ai/reference) for full parameter details.

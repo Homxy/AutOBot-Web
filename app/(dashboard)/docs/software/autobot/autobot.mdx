@@ -1,32 +1,58 @@
 # AutOBot Library
 
-## AutOBot Setup Drive (`autobot_begin`)
+## AutOBot Motor Setup (`autobot_set_motors`)
 
-Initializes the AutOBot with a specific drive type (Differential, Omni 3-Wheel, Mecanum) and deviation.
+Manually assigns pins to control the four standard motors of the AutOBot. You can assign up to four motors using these functions, defining their respective `A` and `B` directional pins.
 
 ### Arduino Generates
 
 ```cpp
-robot.begin("drive_type", deviation);
+robot.setMotor1Pins(18, 19);
+robot.setMotor2Pins(22, 23);
+robot.setMotor3Pins(25, 26);
+robot.setMotor4Pins(27, 14);
+```
+
+---
+
+## AutOBot Setup Drive (`autobot_begin`)
+
+Initializes the AutOBot with a specific DriveType and deviation. The `DriveType` must be one of the enum values: `DRIVE_DIFFERENTIAL`, `DRIVE_OMNI_3W`, or `DRIVE_MECANUM`.
+
+### Arduino Generates
+
+```cpp
+robot.begin(DRIVE_DIFFERENTIAL, deviation); // Example using Differential drive
 ```
 
 ---
 
 ## AutOBot Simple Movement (`autobot_move_simple`)
 
-Moves the AutOBot in standard directions (forward, backward, slide left, slide right, rotate).
+Moves the AutOBot in standard directions and angular rotations using specific functions.
 
 ### Arduino Generates
 
 ```cpp
-robot.goForward(speed, time);
+// Basic directional controls
+robot.goForward(speed, timeMs);
+robot.goBackward(speed, timeMs);
+
+// Omni/Mecanum sliding maneuvers
+robot.slideLeft(speed, timeMs);
+robot.slideRight(speed, timeMs);
+robot.slide(degree, speed, timeMs); // Slide at a specific degree (0-360)
+
+// Rotational controllers
+robot.rotateCW(speed, timeMs); //ro tate clockwise
+robot.rotateCCW(speed, timeMs); //rotate counter-clockwise
 ```
 
 ---
 
 ## AutOBot Drive Vector (`autobot_drive`)
 
-Moves the AutOBot using X, Y, and W vectors.
+Moves the AutOBot continuously using precise kinematics based on X, Y, and W (angular velocity) vectors continuously. 
 
 ### Arduino Generates
 
@@ -50,7 +76,7 @@ robot.stop();
 
 ## AutOBot Teleop (`autobot_teleop`)
 
-Starts the AutOBot Teleop mode (e.g., via Bluetooth).
+Configures constraints and handles Bluetooth server connections for the AutOBot Teleop mode (Mobile Controller).
 
 ### Arduino Generates
 
@@ -59,4 +85,3 @@ robot.telop();
 ```
 
 ---
-

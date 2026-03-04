@@ -1,32 +1,58 @@
 # ไลบรารี AutOBot
 
-## ตั้งค่าการขับเคลื่อน AutOBot (`autobot_begin`)
+## ตั้งค่าพินมอเตอร์ให้ AutOBot (`autobot_set_motors`)
 
-ตั้งค่าประเภทล้อขับเคลื่อนให้ AutOBot (Differential, Omni 3-Wheel, Mecanum) และค่าความคลาดเคลื่อน
+กำหนดค่าพินสำหรับควบคุมมอเตอร์ของ AutOBot ทั้งหมดสี่ตัว (แบบ Manual) โดยผู้ใช้สามารถระบุพิน `A` และ `B` สำหรับการกำหนดทิศทางของแต่ละล้อ
 
 ### Arduino Generates
 
 ```cpp
-robot.begin("drive_type", deviation);
+robot.setMotor1Pins(18, 19);
+robot.setMotor2Pins(22, 23);
+robot.setMotor3Pins(25, 26);
+robot.setMotor4Pins(27, 14);
+```
+
+---
+
+## ตั้งค่าการขับเคลื่อน AutOBot (`autobot_begin`)
+
+ตั้งค่าประเภทล้อขับเคลื่อนให้ AutOBot และค่าความคลาดเคลื่อน (deviation) สำหรับการปรับจูนมอเตอร์ โดยพารามิเตอร์ `DriveType` จะต้องดึงมาจากค่า enum พิเศษ ได้แก่: `DRIVE_DIFFERENTIAL`, `DRIVE_OMNI_3W`, หรือ `DRIVE_MECANUM`
+
+### Arduino Generates
+
+```cpp
+robot.begin(DRIVE_DIFFERENTIAL, deviation); // ตัวอย่างใช้ Differential drive
 ```
 
 ---
 
 ## การเคลื่อนที่พื้นฐาน (`autobot_move_simple`)
 
-สั่ง AutOBot เคลื่อนที่ตามทิศทาง (เดินหน้า, ถอยหลัง, สไลด์ซ้าย, สไลด์ขวา, หมุน)
+สั่ง AutOBot เคลื่อนที่ตามทิศทางที่ต้องการ (เดินหน้า, ถอยหลัง, สไลด์ซ้าย, สไลด์ขวา, สไลด์องศาอิสระ, หรือการหมุนตัวรอบทิศทาง)
 
 ### Arduino Generates
 
 ```cpp
-robot.goForward(speed, time);
+// การเคลื่อนที่ขั้นพื้นฐาน
+robot.goForward(speed, timeMs);
+robot.goBackward(speed, timeMs);
+
+// การสไลด์สำหลับล้อแบบออมนิ และ เมคคานัม
+robot.slideLeft(speed, timeMs);
+robot.slideRight(speed, timeMs);
+robot.slide(degree, speed, timeMs); // สไลด์ในองศาที่ระบุอิสระ (0-360 องศา)
+
+// การควบคุมการหมุน (Rotate)
+robot.rotateCW(speed, timeMs); //หมุนตามเข็มนาฬิกา
+robot.rotateCCW(speed, timeMs); //หมุนทวนเข็มนาฬิกา
 ```
 
 ---
 
 ## การขับเคลื่อนแบบเวกเตอร์ (`autobot_drive`)
 
-ขับเคลื่อน AutOBot โดยใช้เวกเตอร์ X, Y และ W
+ขับเคลื่อน AutOBot แบบต่อเนื่องโดยใช้กลศาสตร์จลน์ศาสตร์พื้นฐานผ่านเวกเตอร์ X, Y และ W (Angular Velocity)
 
 ### Arduino Generates
 
@@ -50,7 +76,7 @@ robot.stop();
 
 ## ระบบ Teleop ของ AutOBot (`autobot_teleop`)
 
-เริ่มใช้งานโหมดควบคุมด้วยสวิตช์มือถือ/บลูทูธ (Teleop)
+เริ่มใช้งานโหมดควบคุมด้วยการเชื่อมบลูทูธกับโมบายแอปพลิเคชัน (Bluetooth Server Data Streaming) (Teleop)
 
 ### Arduino Generates
 
@@ -59,4 +85,3 @@ robot.telop();
 ```
 
 ---
-
