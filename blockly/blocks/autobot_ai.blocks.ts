@@ -17,6 +17,8 @@ export function initAutOBotAIBlocks() {
                 .setCheck("Number")
                 .appendField("Base Speed");
             this.appendValueInput("TURN").setCheck("Number").appendField("Turn Gain");
+            this.appendValueInput("BOX").setCheck("Number").appendField("Box Size");
+            this.appendValueInput("DEADZONE").setCheck("Number").appendField("Deadzone");
             this.setPreviousStatement(true, null);
             this.setNextStatement(true, null);
             this.setColour("#FF5757");
@@ -37,6 +39,21 @@ export function initAutOBotAIBlocks() {
             this.appendValueInput("SPEED")
                 .setCheck("Number")
                 .appendField("Base Speed");
+            this.appendValueInput("TURN")
+                .setCheck("Number")
+                .appendField("Turn Gain");
+            this.appendValueInput("THRESH")
+                .setCheck("Number")
+                .appendField("Threshold");
+            this.appendValueInput("DEFS")
+                .setCheck("Number")
+                .appendField("Fallback Speed");
+            this.appendValueInput("DEFD")
+                .setCheck("Number")
+                .appendField("Fallback Dir");
+            this.appendValueInput("DEFA")
+                .setCheck("Number")
+                .appendField("Fallback Ang");
             this.setPreviousStatement(true, null);
             this.setNextStatement(true, null);
             this.setColour("#FF5757");

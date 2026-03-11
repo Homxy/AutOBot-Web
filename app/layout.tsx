@@ -3,11 +3,12 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import SessionProvider from "@/components/SessionProvider";
 import { getServerSession } from 'next-auth'
+import { SpeedInsights } from "@vercel/speed-insights/next"
 
-const inter = Inter({ 
+const inter = Inter({
   subsets: ['latin'],
   // Define a CSS variable so Tailwind can use it
-  variable: '--font-inter', 
+  variable: '--font-inter',
 })
 
 
@@ -30,6 +31,7 @@ export default async function RootLayout({
       <body
         className={`{inter.variable} min-h-screen bg-white antialiased`}
       >
+        <SpeedInsights />
         <SessionProvider session={session}>
           {children}
         </SessionProvider>

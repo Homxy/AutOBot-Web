@@ -40,6 +40,7 @@ ArduinoGenerator.workspaceToCode = function (workspace: Blockly.Workspace | unde
   // Reset state
   ArduinoGenerator.setupPins = new Set();
   Library.AutOBot = false;
+  Library.AutOBotAI = false;
 
   let libraryIncludes = '';
   let globalDeclarations = '';
@@ -59,7 +60,7 @@ ArduinoGenerator.workspaceToCode = function (workspace: Blockly.Workspace | unde
   }
 
   if (Library.AutOBotAI) {
-    libraryIncludes += `#include <AutOBotPi.h>\n`;
+    libraryIncludes += `#include <AutOBotAI.h>\n`;
     globalDeclarations += `AutOBotAI ai;\n`;
   }
 

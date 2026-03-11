@@ -57,9 +57,7 @@ const BlocklyToolBoxAppearence = {
             name: 'Text',
             colour: '#FF5757',
             contents: [
-                { kind: 'block', type: 'text' },
-                { kind: 'block', type: 'text_print' },
-                { kind: 'block', type: 'serial_begin' }
+                { kind: 'block', type: 'text' }
             ]
         },
         { kind: 'category', name: 'Variables', custom: 'VARIABLE', colour: '#FFBD59' },
@@ -70,8 +68,7 @@ const BlocklyToolBoxAppearence = {
             contents: [
                 { kind: 'block', type: 'pin_out' },
                 { kind: 'block', type: 'pin_set' },
-                { kind: 'block', type: 'wait_ms', fields: { DURATION: 1000 } },
-                { kind: 'block', type: 'serial_begin' }
+                { kind: 'block', type: 'wait_ms', fields: { DURATION: 1000 } }
             ]
         },
         {
@@ -114,13 +111,22 @@ const BlocklyToolBoxAppearence = {
                     type: 'autobot_ai_human',
                     inputs: {
                         SPEED: { shadow: { type: 'math_number', fields: { NUM: 0 } } },
-                        TURN: { shadow: { type: 'math_number', fields: { NUM: 0.5 } } }
+                        TURN: { shadow: { type: 'math_number', fields: { NUM: 0.5 } } },
+                        BOX: { shadow: { type: 'math_number', fields: { NUM: 30000 } } },
+                        DEADZONE: { shadow: { type: 'math_number', fields: { NUM: 5000 } } }
                     }
                 },
                 {
                     kind: 'block',
                     type: 'autobot_ai_line',
-                    inputs: { SPEED: { shadow: { type: 'math_number', fields: { NUM: 50 } } } }
+                    inputs: {
+                        SPEED: { shadow: { type: 'math_number', fields: { NUM: 0 } } },
+                        TURN: { shadow: { type: 'math_number', fields: { NUM: 0.5 } } },
+                        THRESH: { shadow: { type: 'math_number', fields: { NUM: 100 } } },
+                        DEFS: { shadow: { type: 'math_number', fields: { NUM: 0 } } },
+                        DEFD: { shadow: { type: 'math_number', fields: { NUM: 0 } } },
+                        DEFA: { shadow: { type: 'math_number', fields: { NUM: 0 } } }
+                    }
                 }
             ]
         }

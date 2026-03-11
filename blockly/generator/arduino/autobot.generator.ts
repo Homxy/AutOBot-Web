@@ -34,6 +34,6 @@ export function initAutOBotGenerators(generator: any, Library: any) {
 
     generator.forBlock["autobot_teleop"] = function (block: Blockly.Block) {
         Library.AutOBot = true;
-        return `robot.telop();\n`;
+        return `Serial.begin(115200);\nrobot.telop();\n`;
     };
 }

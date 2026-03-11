@@ -142,25 +142,4 @@ export function initArduinoBlocks() {
         },
     };
 
-    Blockly.Blocks["serial_begin"] = {
-        init: function () {
-            this.appendDummyInput()
-                .appendField("Serial begin at")
-                .appendField(
-                    new Blockly.FieldDropdown([
-                        ["9600", "9600"],
-                        ["19200", "19200"],
-                        ["38400", "38400"],
-                        ["57600", "57600"],
-                        ["115200", "115200"],
-                    ]),
-                    "BAUD_RATE"
-                )
-                .appendField("baud");
-            this.setPreviousStatement(true, null);
-            this.setNextStatement(true, null);
-            this.setColour(230);
-            this.setTooltip("Initialize Serial communication with a specific baud rate.");
-        },
-    };
 }

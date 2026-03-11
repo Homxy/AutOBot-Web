@@ -31,9 +31,4 @@ export function initArduinoGenerators(generator: any) {
         const statements = generator.statementToCode(block, "DO");
         return 'void loop() {\n' + statements.replace(/^/gm, '  ') + '\n}\n';
     };
-
-    generator.forBlock["serial_begin"] = function (block: Blockly.Block) {
-        const baudRate = block.getFieldValue("BAUD_RATE");
-        return `Serial.begin(${baudRate});\n`;
-    };
 }

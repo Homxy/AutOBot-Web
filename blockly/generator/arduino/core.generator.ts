@@ -96,8 +96,4 @@ export function initCoreGenerators(generator: Blockly.Generator) {
         return [code, Order.ATOMIC];
     };
 
-    generator.forBlock['text_print'] = function (block) {
-        const msg = generator.valueToCode(block, 'TEXT', Order.ATOMIC) || '""';
-        return `Serial.println(${msg});\n`;
-    };
 }
