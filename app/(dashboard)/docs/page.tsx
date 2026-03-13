@@ -35,6 +35,17 @@ export default function OverviewPage() {
             <li><Link href="/docs/ai/usage_th" style={{ color: '#facc15' }}>เริ่มต้นใช้งานระบบ AI (Getting Started with AI)</Link></li>
           </ul>
         </section>
+
+        <section style={{ marginTop: '30px' }}>
+          <h2 style={{ color: '#38bdf8' }}>GitHub</h2>
+          <ul style={{ lineHeight: '1.8' }}>
+            <li><a href="https://github.com/Homxy/AutOBot-Web" target="_blank" rel="noopener noreferrer" style={{ color: '#facc15' }}>AutOBot-Web Repository</a></li>
+            <li><a href="https://github.com/CannabiZz9/Aut-obot_Library" target="_blank" rel="noopener noreferrer" style={{ color: '#facc15' }}>Aut-obot Library Repository</a></li>
+            <li><a href="https://github.com/Homxy/AutOBot" target="_blank" rel="noopener noreferrer" style={{ color: '#facc15' }}>AutOBot Repository</a></li>
+            <li><a href="https://archive.org/details/autobot-v-2" target="_blank" rel="noopener noreferrer" style={{ color: '#facc15' }}>Autobot Raspberry Pi Image (Archive.org)</a></li>
+            <li><a href="https://www.youtube.com/channel/UCcS6pYeV3nIloG_VG7k-oeg" target="_blank" rel="noopener noreferrer" style={{ color: '#facc15' }}>🎬 AutOBot YouTube Channel</a></li>
+          </ul>
+        </section>
       </div>
     );
   }
@@ -67,6 +78,17 @@ export default function OverviewPage() {
           <li><Link href="/docs/feature/component" style={{ color: '#facc15' }}>Component List</Link></li>
           <li><Link href="/docs/software" style={{ color: '#facc15' }}>Getting Started with Blockly</Link></li>
           <li><Link href="/docs/ai/usage" style={{ color: '#facc15' }}>Getting Started with AI</Link></li>
+        </ul>
+      </section>
+
+      <section style={{ marginTop: '30px' }}>
+        <h2 style={{ color: '#38bdf8' }}>GitHub</h2>
+        <ul style={{ lineHeight: '1.8' }}>
+          <li><a href="https://github.com/Homxy/AutOBot-Web" target="_blank" rel="noopener noreferrer" style={{ color: '#facc15' }}>AutOBot-Web Repository</a></li>
+          <li><a href="https://github.com/CannabiZz9/Aut-obot_Library" target="_blank" rel="noopener noreferrer" style={{ color: '#facc15' }}>Aut-obot Library Repository</a></li>
+          <li><a href="https://github.com/Homxy/AutOBot" target="_blank" rel="noopener noreferrer" style={{ color: '#facc15' }}>AutOBot Repository</a></li>
+          <li><a href="https://archive.org/details/autobot-v-2" target="_blank" rel="noopener noreferrer" style={{ color: '#facc15' }}>Autobot Raspberry Pi Image (Archive.org)</a></li>
+          <li><a href="https://www.youtube.com/channel/UCcS6pYeV3nIloG_VG7k-oeg" target="_blank" rel="noopener noreferrer" style={{ color: '#facc15' }}>🎬 AutOBot YouTube Channel</a></li>
         </ul>
       </section>
     </div>
