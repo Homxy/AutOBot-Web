@@ -44,6 +44,7 @@ export default function OverviewPage() {
             <li><a href="https://github.com/Homxy/AutOBot" target="_blank" rel="noopener noreferrer" style={{ color: '#facc15' }}>AutOBot Repository</a></li>
             <li><a href="https://archive.org/details/autobot-v-2" target="_blank" rel="noopener noreferrer" style={{ color: '#facc15' }}>Autobot Raspberry Pi Image (Archive.org)</a></li>
             <li><a href="https://www.youtube.com/channel/UCcS6pYeV3nIloG_VG7k-oeg" target="_blank" rel="noopener noreferrer" style={{ color: '#facc15' }}>🎬 AutOBot YouTube Channel</a></li>
+            <li><a href="https://drive.google.com/drive/folders/1wtMq7maUtxcv9LgPFOuRBe9e3S9Z6R8r?usp=sharing" target="_blank" rel="noopener noreferrer" style={{ color: '#facc15' }}>AutOBot Blueprints</a></li>
           </ul>
         </section>
       </div>
@@ -89,6 +90,7 @@ export default function OverviewPage() {
           <li><a href="https://github.com/Homxy/AutOBot" target="_blank" rel="noopener noreferrer" style={{ color: '#facc15' }}>AutOBot Repository</a></li>
           <li><a href="https://archive.org/details/autobot-v-2" target="_blank" rel="noopener noreferrer" style={{ color: '#facc15' }}>Autobot Raspberry Pi Image (Archive.org)</a></li>
           <li><a href="https://www.youtube.com/channel/UCcS6pYeV3nIloG_VG7k-oeg" target="_blank" rel="noopener noreferrer" style={{ color: '#facc15' }}>🎬 AutOBot YouTube Channel</a></li>
+          <li><a href="https://drive.google.com/drive/folders/1wtMq7maUtxcv9LgPFOuRBe9e3S9Z6R8r?usp=sharing" target="_blank" rel="noopener noreferrer" style={{ color: '#facc15' }}>AutOBot Blueprints</a></li>
         </ul>
       </section>
     </div>
