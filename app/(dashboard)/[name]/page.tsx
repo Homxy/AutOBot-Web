@@ -53,10 +53,19 @@ export default function BlocklyPage({ params }: { params: Promise<{ name: string
     };
 
     const initPorts = async () => {
-        const arduinoPort = await fetch("http://localhost:8080/arduino/ports");
-        const portsData = await arduinoPort.json();
-        console.log("Initial ports:", portsData);
-        setPorts(portsData);
+        try {
+            const arduinoPort = await fetch("http://localhost:8080/arduino/ports");
+            const portsData = await arduinoPort.json();
+            console.log("Initial ports:", portsData);
+            setPorts(portsData);
+        } catch (error) {
+            showToast({
+                type: "info",
+                title: "Ports Error",
+                description: "Error fetching ports.",
+                duration: 8000,
+            });
+        }
     };
 
     useEffect(() => {
