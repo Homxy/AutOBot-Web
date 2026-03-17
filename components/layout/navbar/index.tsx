@@ -10,6 +10,7 @@ import ProfileMenu from '../../ui/profile'
 const Links = [
   { href: "/", text: "Home" },
   { href: "/docs", text: "Docs" },
+  { href: "/downloads", text: "Downloads" },
 ]
 
 export default function Navbar() {

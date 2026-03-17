@@ -3,57 +3,53 @@ import React, { useEffect, useRef, useState } from "react";
 import * as Blockly from "blockly/core";
 import "blockly/blocks";
 import * as En from "blockly/msg/en";
+import QRCode from "react-qr-code";
 import { ArduinoGenerator } from "@/blockly/generator/arduino";
 import BlocklyToolBoxLogic from "@/blockly/toolbox/BlocklyToolBoxLogic";
 import BlocklyToolBoxAppearence from "@/blockly/toolbox/BlocklyToolBoxAppearence";
 import { Download, FolderOpen, Trash2, Save, ChevronDown } from 'lucide-react';
+import { useToast } from "@/components/ui/toast/ToastContext";
 
-export default function BlocklyPage({ params }: { params: Promise<{ id: string }> }) {
+export default function BlocklyPage() {
     const blocklyDivRef = useRef<HTMLDivElement | null>(null);
     const workspaceRef = useRef<Blockly.WorkspaceSvg | null>(null);
     const fileInputRef = useRef<HTMLInputElement | null>(null);
     const [code, setCode] = useState<string>("// Code will appear here…\n");
-    const [name, setName] = useState("untitled");
+    const [name, setName] = useState("");
     const [Ports, setPorts] = useState<any[]>([]);
+    const [BotID, setBotID] = useState<string>("");
     const [selectPort, setSelectPort] = useState<string>("");
     let autosaveTimer: NodeJS.Timeout;
+    const { showToast } = useToast();
+
+
+    const onWorkSpaceChange = (name: string) => {
+        clearTimeout(autosaveTimer);
+        autosaveTimer = setTimeout(async () => {
+            const state = Blockly.serialization.workspaces.save(workspaceRef.current!);
+            try {
+                await fetch(`/api/workspace/${name}`, {
+                    method: "PATCH",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ blocklyData: state }),
+                });
+
+            } catch (err) {
+                console.error("save failed", err);
+            }
+        }, 60000);
+    };
 
     const initPorts = async () => {
-        const arduinoPort = await fetch("/api/getport");
+        const arduinoPort = await fetch("http://localhost:8080/arduino/ports");
         const portsData = await arduinoPort.json();
         console.log("Initial ports:", portsData);
         setPorts(portsData);
     };
 
-    const getPorts = async () => {
-        const ports = await (navigator as any).serial.getPorts();
-
-        (navigator as any).serial.addEventListener("connect", async (event: any) => {
-            console.log("Serial port connected event detected");
-            const serialPort = event.target;
-            const serialPortInfo = serialPort.getInfo();
-            const arduinoPort = await fetch("/api/getport");
-            const portsData = await arduinoPort.json();
-            portsData.forEach((p: any) => {
-                setPorts((prevPorts) => [...prevPorts, p]);
-            });
-        });
-
-        (navigator as any).serial.addEventListener("disconnect", async (event: any) => {
-            console.log("Serial port disconnected event detected");
-            const serialPort = event.target;
-            const serialPortInfo = serialPort.getInfo();
-            setPorts(prevPorts => prevPorts.filter(p => {
-                return !(Number.parseInt(p.vid, 16) === serialPortInfo.usbVendorId && Number.parseInt(p.pid, 16) === serialPortInfo.usbProductId);
-            }));
-        });
-    };
-
-
     useEffect(() => {
         if (!blocklyDivRef.current) return;
         initPorts();
-        getPorts();
         BlocklyToolBoxLogic();
 
         Object.assign(Blockly.Msg, En);
@@ -85,23 +81,18 @@ export default function BlocklyPage({ params }: { params: Promise<{ id: string }
             const blocks = workspace.getAllBlocks(false);
             const hasStart = blocks.some(b => b.type === "on_start");
             const hasLoop = blocks.some(b => b.type === "on_loop");
-
             if (!hasStart || !hasLoop) {
                 const on_start = workspace.newBlock("on_start");
                 const on_loop = workspace.newBlock("on_loop");
-                const serial_begin = workspace.newBlock("serial_begin");
 
                 on_start.initSvg();
                 on_loop.initSvg();
-                serial_begin.initSvg();
 
                 on_start.nextConnection?.connect(on_loop.previousConnection!);
-                on_start.getInput("DO")?.connection?.connect(serial_begin.previousConnection!);
                 on_start.moveBy(50, 50);
 
                 on_start.setDeletable(false);
                 on_loop.setDeletable(false);
-                serial_begin.setDeletable(false);
             }
         });
         // 6. Handle Resizing
@@ -120,32 +111,77 @@ export default function BlocklyPage({ params }: { params: Promise<{ id: string }
 
     const runCode = async () => {
         if (!workspaceRef.current) return;
+
         const arduinoCode = ArduinoGenerator.workspaceToCode(workspaceRef.current) || "// (no blocks yet)\n";
+        const hasTeleop = arduinoCode.includes("    robot.telop();");
 
         try {
-            await fetch("api/writefile", {
+            showToast({
+                type: "info",
+                title: "Upload Info",
+                description: "Uploading...",
+                duration: 20000,
+            });
+            await fetch("http://localhost:8080/arduino/rewrite", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ content: arduinoCode }),
+                body: JSON.stringify({ code: arduinoCode }),
             });
-            console.log("from client", selectPort);
-            const res = await fetch("/api/upload", {
+
+            const res = await fetch("http://localhost:8080/arduino/upload", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ port: selectPort }),
             });
 
             if (res.ok) {
-                alert("Code uploaded successfully!");
-            } else {
-                alert("Failed to upload code.");
+                showToast({
+                    type: "success",
+                    title: "Upload Success",
+                    description: "Code uploaded successfully!",
+                });
+
             }
+            else {
+                showToast({
+                    type: "error",
+                    title: "Upload Failed",
+                    description: "Failed to upload code.",
+                });
+            }
+
         } catch (err) {
-            console.error("Upload failed", err);
-            alert("An error occurred during upload.");
+            showToast({
+                type: "error",
+                title: "Upload Error",
+                description: "An error occurred while uploading.",
+            });
+        }
+
+        if (hasTeleop) {
+
+            const serial = await fetch("http://localhost:8080/arduino/serial", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ port: selectPort }),
+            });
+
+            const rawText = await serial.text();
+            console.log("Serial response:", rawText);
+            try {
+                const data = JSON.parse(rawText);
+                if (data && data.bot_id) {
+                    setBotID(data.bot_id);
+                } else if (data && data.id) {
+                    setBotID(data.id);
+                } else {
+                    setBotID(rawText);
+                }
+            } catch (e) {
+                setBotID(rawText);
+            }
         }
     };
-
     const saveCode = () => {
         if (!workspaceRef.current) return;
 
@@ -208,9 +244,17 @@ export default function BlocklyPage({ params }: { params: Promise<{ id: string }
                     <pre className="p-4 text-xs leading-relaxed overflow-auto text-pink-600 flex-1">
                         {code}
                     </pre>
-                    <div className="p-3 border-t border-gray-200 text-green-400 text-[10px] h-32 shrink-0">
-                        <div className="font-bold uppercase tracking-widest opacity-50 mb-2">QR Code</div>
-                        {/* QR Code logic or image would go here */}
+                    <div className="p-3 border-t border-gray-200 text-green-400 text-[10px] h-32 shrink-0 flex flex-col items-center overflow-hidden">
+                        <div className="font-bold uppercase tracking-widest opacity-50 mb-2 self-start w-full">QR Code</div>
+                        {BotID ? (
+                            <div className="bg-white p-1.5 rounded-md shadow-sm">
+                                <QRCode value={String(BotID)} size={70} />
+                            </div>
+                        ) : (
+                            <div className="flex-1 flex items-center justify-center text-gray-400 opacity-70">
+                                No QR Code
+                            </div>
+                        )}
                     </div>
                 </section>
             </main>
@@ -241,30 +285,34 @@ export default function BlocklyPage({ params }: { params: Promise<{ id: string }
 
                 {/* --- NEW DROPDOWN SECTION --- */}
                 <div className="flex items-center gap-4 ml-auto mr-6">
-                    <div className="relative group">
-                        {/* <select 
-                    className="appearance-none bg-black/20 hover:bg-black/30 border border-white/10 px-4 py-1.5 pr-8 rounded text-xs font-medium cursor-pointer outline-none transition-colors"
-                    value={selectPort}
-                    onChange={(e) => {
-                        const newValue = e.target.value;
-                        setSelectPort(newValue);
-                        console.log("Selected port:", newValue);
-                    }}
-                >
-                    <option value="">
-                        {Ports.length > 0 ? "Select a Port" : "No Ports Found"}
-                    </option>
 
-                    {Ports.map((p, index) => (
-                        <option 
-                            key={p.portAddress || index} 
-                            value={p.portAddress} 
-                            className="bg-[#365AFF]"
+                    <button onClick={initPorts} className="flex items-center gap-2 bg-[#2149FF] px-6 py-2 rounded-lg font-bold shadow-sm transition-all active:scale-95">
+                        Scan Port
+                    </button>
+                    <div className="relative group">
+                        <select
+                            className="appearance-none bg-black/20 hover:bg-black/30 border border-white/10 px-4 py-1.5 pr-8 rounded text-xs font-medium cursor-pointer outline-none transition-colors"
+                            value={selectPort} // Bind the state to the select value
+                            onChange={(e) => {
+                                const newValue = e.target.value;
+                                setSelectPort(newValue);
+                                console.log("Selected port:", newValue);
+                            }}
                         >
-                            {p.portAddress}
-                        </option>
-                    ))}
-                </select> */}
+                            <option value="">
+                                {!Ports || Ports.length === 0 ? "No Ports Found" : "Select a Port"}
+                            </option>
+
+                            {Ports?.filter(Boolean).map((p, index) => (
+                                <option
+                                    key={p.address || index}
+                                    value={p.address}
+                                    className="bg-[#365AFF]"
+                                >
+                                    {p.address}
+                                </option>
+                            ))}
+                        </select>
                         <div className="absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none">
                             <ChevronDown size={14} className="opacity-70" />
                         </div>
@@ -273,7 +321,7 @@ export default function BlocklyPage({ params }: { params: Promise<{ id: string }
                     <div className="flex items-center gap-6 text-xs font-medium tracking-tight">
                         <div className="flex items-center gap-2 bg-black/20 px-3 py-1 rounded">
                             <FolderOpen size={14} />
-                            <span>{name}</span>
+                            <span>Untitled</span>
                         </div>
                     </div>
                 </div>
