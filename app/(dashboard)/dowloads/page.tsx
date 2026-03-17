@@ -4,21 +4,13 @@ export default function DownloadPage() {
             title: "Android App",
             description: "Download the AutOBot Android application to control and manage your robot from your phone.",
             button: "Download APK",
-<<<<<<< HEAD
-            link: "https://drive.google.com/file/d/1jMpbV9HIeEHezylkLoPKubWp-y333IDW/view?usp=drive_link",
-=======
             link: "https://drive.google.com/file/d/1EkV2Iznh29R37cb086VRDS6v05L3ap2x/view?usp=sharing",
->>>>>>> dev
         },
         {
             title: "AutOBot Agent",
             description: "Run AutOBot agent on your computer to upload code to your robot.",
             button: "Download Installer",
-<<<<<<< HEAD
-            link: "https://drive.google.com/file/d/1MemTtz1GKnvhpsyQF9dfMenrCq4RgQXD/view?usp=sharing",
-=======
             link: "https://drive.google.com/file/d/1l8Z5PsSzQoruAdrtf73q2ZnJcanKq2cd/view?usp=sharing",
->>>>>>> dev
         },
         {
             title: "CP210x Driver",
