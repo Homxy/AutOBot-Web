@@ -10,7 +10,7 @@ export default function DownloadPage() {
             title: "AutOBot Agent",
             description: "Run AutOBot agent on your computer to upload code to your robot.",
             button: "Download Installer",
-            link: "https://drive.google.com/file/d/1l8Z5PsSzQoruAdrtf73q2ZnJcanKq2cd/view?usp=sharing",
+            link: "https://drive.google.com/file/d/1JfxzrlM3giqsXh5wiFGr8DWf2azMF_LT/view?usp=sharing",
         },
         {
             title: "CP210x Driver",
