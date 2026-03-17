@@ -103,7 +103,7 @@ export default function BlocklyPage() {
         if (!workspaceRef.current) return;
 
         const arduinoCode = ArduinoGenerator.workspaceToCode(workspaceRef.current) || "// (no blocks yet)\n";
-        const hasTeleop = arduinoCode.includes("    robot.telop();");
+        const hasTeleop = arduinoCode.includes("    myRobot.teleop();");
 
         try {
             showToast({
