@@ -5,7 +5,7 @@ const Order = { ATOMIC: 0 };
 export function initAutOBotAIGenerators(generator: any, Library: any) {
     generator.forBlock['autobot_ai_begin'] = function (block: Blockly.Block) {
         Library.AutOBotAI = true;
-        return `Serial2.begin(115200, SERIAL_8N1, ai.rx, ai.tx);\nai.begin(robot);\n`;
+        return `Serial2.begin(115200, SERIAL_8N1, myAi.rx, myAi.tx);\nai.begin(myRobot);\n`;
     };
 
     generator.forBlock['autobot_ai_human'] = function (block: Blockly.Block) {
@@ -13,7 +13,7 @@ export function initAutOBotAIGenerators(generator: any, Library: any) {
         const turn = generator.valueToCode(block, 'TURN', Order.ATOMIC) || '0.5';
         const box = generator.valueToCode(block, 'BOX', Order.ATOMIC) || '30000';
         const deadzone = generator.valueToCode(block, 'DEADZONE', Order.ATOMIC) || '5000';
-        return `ai.requestHuman(${speed}, ${turn}, ${box}, ${deadzone});\n`;
+        return `myAi.requestHuman(${speed}, ${turn}, ${box}, ${deadzone});\n`;
     };
 
     generator.forBlock['autobot_ai_line'] = function (block: Blockly.Block) {
@@ -24,10 +24,10 @@ export function initAutOBotAIGenerators(generator: any, Library: any) {
         const defs = generator.valueToCode(block, 'DEFS', Order.ATOMIC) || '0';
         const defd = generator.valueToCode(block, 'DEFD', Order.ATOMIC) || '0';
         const defa = generator.valueToCode(block, 'DEFA', Order.ATOMIC) || '0';
-        return `ai.requestLine(${speed}, ${turn}, ${thresh}, "${color}", ${defs}, ${defd}, ${defa});\n`;
+        return `myAi.requestLine(${speed}, ${turn}, ${thresh}, "${color}", ${defs}, ${defd}, ${defa});\n`;
     };
 
     generator.forBlock['autobot_ai_handle'] = function (block: Blockly.Block) {
-        return `ai.handle();\n`;
+        return `myAi.handle();\n`;
     };
 }

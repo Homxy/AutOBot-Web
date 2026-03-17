@@ -56,12 +56,12 @@ ArduinoGenerator.workspaceToCode = function (workspace: Blockly.Workspace | unde
   // Handle AutOBot Library Requirements
   if (Library.AutOBot) {
     libraryIncludes += `#include <AutOBot.h>\n`;
-    globalDeclarations += `AutOBot robot;\n\n`;
+    globalDeclarations += `AutOBot myRobot;\n\n`;
   }
 
   if (Library.AutOBotAI) {
     libraryIncludes += `#include <AutOBotAI.h>\n`;
-    globalDeclarations += `AutOBotAI ai;\n`;
+    globalDeclarations += `AutOBotAI myAi;\n`;
   }
 
   let finalCode = libraryIncludes + '\n' + globalDeclarations + mainCode;

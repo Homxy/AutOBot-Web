@@ -8,7 +8,7 @@ export function initAutOBotGenerators(generator: any, Library: any) {
         Library.AutOBot = true; // Flag that we need headers and object declaration
         const driveType = block.getFieldValue('TYPE');
         const deviation = block.getFieldValue('DEV');
-        return `robot.begin(${driveType}, ${deviation});\n`;
+        return `myRobot.begin(${driveType}, ${deviation});\n`;
     };
 
     generator.forBlock["autobot_move_simple"] = function (block: Blockly.Block) {
@@ -16,7 +16,7 @@ export function initAutOBotGenerators(generator: any, Library: any) {
         const dir = block.getFieldValue('DIR');
         const speed = generator.valueToCode(block, 'SPEED', Order.ATOMIC) || '0';
         const time = generator.valueToCode(block, 'TIME', Order.ATOMIC) || '0';
-        return `robot.${dir}(${speed}, ${time});\n`;
+        return `myRobot.${dir}(${speed}, ${time});\n`;
     };
 
     generator.forBlock["autobot_drive"] = function (block: Blockly.Block) {
@@ -24,16 +24,16 @@ export function initAutOBotGenerators(generator: any, Library: any) {
         const x = generator.valueToCode(block, 'X', Order.ATOMIC) || '0';
         const y = generator.valueToCode(block, 'Y', Order.ATOMIC) || '0';
         const w = generator.valueToCode(block, 'W', Order.ATOMIC) || '0';
-        return `robot.drive(${x}, ${y}, ${w});\n`;
+        return `myRobot.drive(${x}, ${y}, ${w});\n`;
     };
 
     generator.forBlock["autobot_stop"] = function (block: Blockly.Block) {
         Library.AutOBot = true;
-        return `robot.stop();\n`;
+        return `myRobot.stop();\n`;
     };
 
     generator.forBlock["autobot_teleop"] = function (block: Blockly.Block) {
         Library.AutOBot = true;
-        return `Serial.begin(115200);\nrobot.telop();\n`;
+        return `Serial.begin(115200);\nmyRobot.telop();\n`;
     };
 }

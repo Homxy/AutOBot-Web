@@ -10,11 +10,16 @@ import BlocklyToolBoxAppearence from "@/blockly/toolbox/BlocklyToolBoxAppearence
 import { Download, FolderOpen, Trash2, Save, ChevronDown } from 'lucide-react';
 import { useToast } from "@/components/ui/toast/ToastContext";
 
+<<<<<<< HEAD
 export default function BlocklyPage({ params }: { params: Promise<{ name: string }> }) {
+=======
+export default function BlocklyPage() {
+>>>>>>> dev
     const blocklyDivRef = useRef<HTMLDivElement | null>(null);
     const workspaceRef = useRef<Blockly.WorkspaceSvg | null>(null);
     const fileInputRef = useRef<HTMLInputElement | null>(null);
     const [code, setCode] = useState<string>("// Code will appear here…\n");
+<<<<<<< HEAD
     const [Ports, setPorts] = useState<any[]>([]);
     const [BotID, setBotID] = useState<string>("");
     const [selectPort, setSelectPort] = useState<string>("");
@@ -38,6 +43,40 @@ export default function BlocklyPage({ params }: { params: Promise<{ name: string
     };
 
 
+=======
+    const [name, setName] = useState("");
+    const [Ports, setPorts] = useState<any[]>([]);
+    const [BotID, setBotID] = useState<string>("");
+    const [selectPort, setSelectPort] = useState<string>("");
+    let autosaveTimer: NodeJS.Timeout;
+    const { showToast } = useToast();
+
+
+    const onWorkSpaceChange = (name: string) => {
+        clearTimeout(autosaveTimer);
+        autosaveTimer = setTimeout(async () => {
+            const state = Blockly.serialization.workspaces.save(workspaceRef.current!);
+            try {
+                await fetch(`/api/workspace/${name}`, {
+                    method: "PATCH",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ blocklyData: state }),
+                });
+
+            } catch (err) {
+                console.error("save failed", err);
+            }
+        }, 60000);
+    };
+
+    const initPorts = async () => {
+        const arduinoPort = await fetch("http://localhost:8080/arduino/ports");
+        const portsData = await arduinoPort.json();
+        console.log("Initial ports:", portsData);
+        setPorts(portsData);
+    };
+
+>>>>>>> dev
     useEffect(() => {
         if (!blocklyDivRef.current) return;
         initPorts();
@@ -72,7 +111,6 @@ export default function BlocklyPage({ params }: { params: Promise<{ name: string
             const blocks = workspace.getAllBlocks(false);
             const hasStart = blocks.some(b => b.type === "on_start");
             const hasLoop = blocks.some(b => b.type === "on_loop");
-
             if (!hasStart || !hasLoop) {
                 const on_start = workspace.newBlock("on_start");
                 const on_loop = workspace.newBlock("on_loop");
@@ -131,7 +169,10 @@ export default function BlocklyPage({ params }: { params: Promise<{ name: string
                     type: "success",
                     title: "Upload Success",
                     description: "Code uploaded successfully!",
+<<<<<<< HEAD
                     duration: 8000,
+=======
+>>>>>>> dev
                 });
 
             }
@@ -314,7 +355,11 @@ export default function BlocklyPage({ params }: { params: Promise<{ name: string
                     <div className="flex items-center gap-6 text-xs font-medium tracking-tight">
                         <div className="flex items-center gap-2 bg-black/20 px-3 py-1 rounded">
                             <FolderOpen size={14} />
+<<<<<<< HEAD
                             <span>untititle</span>
+=======
+                            <span>Untitled</span>
+>>>>>>> dev
                         </div>
                     </div>
                 </div>
