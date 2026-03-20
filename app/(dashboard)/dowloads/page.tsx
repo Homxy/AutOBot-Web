@@ -24,7 +24,7 @@ export default function DownloadPage() {
         <div className="min-h-screen bg-gray-100 py-16 px-6">
             <div className="max-w-6xl mx-auto">
 
-                <h1 className="text-4xl font-bold text-center mb-12">
+                <h1 className="text-4xl font-bold text-center mb-12 text-blue-700">
                     Downloads
                 </h1>
 
@@ -35,11 +35,11 @@ export default function DownloadPage() {
                             className="bg-white rounded-2xl shadow-md p-8 flex flex-col h-full text-center hover:shadow-lg transition"
                         >
 
-                            <h2 className="text-xl font-semibold mb-2">
+                            <h2 className="text-xl font-semibold mb-2 text-blue-700">
                                 {item.title}
                             </h2>
 
-                            <p className="text-gray-600 mb-6">
+                            <p className="text-blue-600 mb-6">
                                 {item.description}
                             </p>
 
